@@ -46,6 +46,11 @@ public class Book extends Product {
     public Book(String id, String name, int year) {
         super(id, name, year);
     }
+    
+    public Book() {
+        super("", "", 0, 0.0);
+        author = publisher = "";
+    }
 
     /**
      * Gets author
