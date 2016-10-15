@@ -5,10 +5,10 @@ package estoresearch;
  */
 public class Product {
 
-    public static final String INVALID_ID = "Invalid input: the ID must be a six digit long number.";
-    public static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
-    public static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
-    public static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
+    private static final String INVALID_ID = "Invalid input: the ID must be a six digit long number.";
+    private static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
+    private static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
+    private static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
 
     public static final int ID_LENGTH = 6;
 
@@ -31,7 +31,7 @@ public class Product {
             throw new IllegalArgumentException(INVALID_ID);
         }
 
-        if (validateName(name)) {
+        if (validateString(name)) {
             this.name = name;
         } else {
             throw new IllegalArgumentException(INVALID_NAME);
@@ -64,7 +64,7 @@ public class Product {
             throw new IllegalArgumentException(INVALID_ID);
         }
 
-        if (validateName(name)) {
+        if (validateString(name)) {
             this.name = name;
         } else {
             throw new IllegalArgumentException(INVALID_NAME);
@@ -128,13 +128,13 @@ public class Product {
     }
 
     /**
-     * Validate name string
+     * Validate string
      *
-     * @param name
-     * @return whether or not the name is valid
+     * @param string
+     * @return whether or not the string is valid
      */
-    private boolean validateName(String name) {
-        return name != null && !id.matches("");
+    public boolean validateString(String string) {
+        return string != null && !id.matches("");
     }
 
     /**
@@ -143,7 +143,7 @@ public class Product {
      * @param name the name to set
      */
     public void setName(String name) {
-        if (validateName(name)) {
+        if (validateString(name)) {
             this.name = name;
         } else {
             throw new IllegalArgumentException(INVALID_NAME);
@@ -336,15 +336,15 @@ public class Product {
 
         pass = !product1.equals(product2);
         System.out.println(pass + "\t!product3.equals(product1)");
-        
+
         pass = product3.toString().equals(product3.id + System.lineSeparator()
                 + product3.name + System.lineSeparator()
                 + product3.year + System.lineSeparator()
                 + product3.price + System.lineSeparator());
         System.out.println(pass + "\tproduct3.toString().equals(product3.id" + System.lineSeparator()
-            + "        + product3.name" + System.lineSeparator()
-            + "        + product3.year" + System.lineSeparator()
-            + "        + product3.price");
+                + "        + product3.name" + System.lineSeparator()
+                + "        + product3.year" + System.lineSeparator()
+                + "        + product3.price");
 
     }
 }

@@ -4,14 +4,51 @@ package estoresearch;
  * @author Courtney Bodi
  */
 public class Electronic extends Product {
-    
+
+    private static final String INVALID_MAKER = "Invalid input: the maker must have at least one character.";
+
     private String maker;
-    
+
+    /**
+     * Electronic constructor with all members
+     *
+     * @param id
+     * @param name
+     * @param year
+     * @param price
+     * @param maker
+     */
+    public Electronic(String id, String name, int year, double price, String maker) {
+        super(id, name, year, price);
+        if (validateString(maker)) {
+            this.maker = maker;
+        } else {
+            throw new IllegalArgumentException(INVALID_MAKER);
+        }
+    }
+
+    /**
+     * Electronic constructor with mandatory members
+     *
+     * @param id
+     * @param name
+     * @param year
+     */
+    public Electronic(String id, String name, int year) {
+        super(id, name, year);
+    }
+
+    /**
+     * Default Electronic constructor
+     */
     public Electronic() {
+        super();
         maker = "";
     }
 
     /**
+     * Gets maker
+     *
      * @return the maker
      */
     public String getMaker() {
@@ -19,34 +56,77 @@ public class Electronic extends Product {
     }
 
     /**
+     * Sets maker
+     *
      * @param maker the maker to set
-     * @return success of setting maker
      */
-    public boolean setMaker(String maker) {
-        if (maker == null) {
-            System.out.println("Invalid input: you must enter a maker.");
-            return false;
-        } else {
+    public void setMaker(String maker) {
+        if (validateString(maker)) {
             this.maker = maker;
-            return true;
+        } else {
+            throw new IllegalArgumentException(INVALID_MAKER);
         }
     }
-    
-    /*public boolean equals(Electronic other) {
-        return this.equals(other)
-            && maker.equals(other.maker);
-    }*/
-    
-    public String toString() {
-        return this.toString() + System.lineSeparator()
-            + maker;
-    }
-    
+
     /**
+     * Determines if Electronics are equal
+     *
+     * @param other
+     * @return whether or not the Electronics are equal
+     */
+    public boolean equals(Electronic other) {
+        return super.equals(other)
+                && maker.equals(other.maker);
+    }
+
+    /**
+     * Gets string with all members of Electronic
+     *
+     * @return string in the form of id, name, year, price, maker
+     */
+    @Override
+    public String toString() {
+        return super.toString() + maker;
+    }
+
+    /**
+     * Main method for testing Electronic
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Electronic elec = new Electronic();
-        System.out.println(elec.getMaker());
+        Electronic elec1 = null, elec2 = null;
+        boolean pass = true;
+        
+        System.out.println("Electronic Class Testing" + System.lineSeparator()
+                + "Prints true when test is passed, false otherwise" + System.lineSeparator());
+        
+        try {
+            elec1 = new Electronic("000000", "foo", 1990, 200.00, "hello");
+        } catch (IllegalArgumentException e) {
+            pass = false;
+        } finally {
+            System.out.println(pass + "\tnew Electronic(\"000000\", \"foo\", 1990, 200.00, \"hello\")");
+        }
+        
+        try {
+            elec2 = new Electronic("000001", "foo", 1990);
+        } catch (IllegalArgumentException e) {
+            pass = false;
+        } finally {
+            System.out.println(pass + "\tnew Electronic(\"000001\", \"foo\", 1990)");
+        }
+        
+        try {
+            elec1.setMaker("");
+        } catch (IllegalArgumentException e) {
+            pass = true;
+        } finally {
+            System.out.println(pass + "\telec1.setMaker(\"\")");
+        }
+        
+        pass = !elec1.equals(elec2);
+        System.out.println(pass + "\t!elec1.equals(elec2)");
+        
     }
 }
