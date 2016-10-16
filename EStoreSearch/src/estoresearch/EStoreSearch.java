@@ -65,7 +65,7 @@ public class EStoreSearch {
                 + "(1) Add book" + System.lineSeparator()
                 + "(2) Add electronic");
     }
-    
+
     private void promptUserSetField(String prompt, Consumer<String> setMethod) {
         int numTries = 0;
         boolean exceptionFlag;
@@ -80,17 +80,41 @@ public class EStoreSearch {
                 numTries++;
                 exceptionFlag = true;
                 if (numTries == MAX_TRIES) {
-                    throw new IllegalArgumentException(e.getMessage());
+                    throw new IllegalArgumentException(MAX_TRIES_MSG);
                 }
             }
-        } while (exceptionFlag == true && numTries != MAX_TRIES);
+        } while (exceptionFlag);
+    }
+
+    private boolean checkIfUniqueId(Book newBook) {
+        for (Book book : books) {
+            if (newBook.getId().equals(book.getId())) {
+                System.out.println("ID already exists!");
+                return false;
+            }
+        }
+        return true;
     }
 
     private void addBook() {
         Book book = new Book();
-        
+
         try {
-            promptUserSetField("Enter book id:", (String userString) -> book.setId(userString));
+            int numTries = 0;
+            boolean unique;
+            
+            do {
+                promptUserSetField("Enter book id:", (String userString) -> book.setId(userString));
+                
+                unique = checkIfUniqueId(book);
+                if (!unique) {
+                    numTries++;
+                    if (numTries == MAX_TRIES) {
+                        throw new IllegalArgumentException(MAX_TRIES_MSG);
+                    }
+                }
+            } while (!unique);
+
             promptUserSetField("Enter book name:", (String userString) -> book.setName(userString));
             promptUserSetField("Enter book year:",
                 (String userString) -> book.setYear(parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR)));
@@ -98,12 +122,12 @@ public class EStoreSearch {
             promptUserSetField("Enter book author:", (String userString) -> book.setAuthor(userString));
             promptUserSetField("Enter book publisher:", (String userString) -> book.setPublisher(userString));
         } catch (IllegalArgumentException e) {
-            System.out.println(MAX_TRIES_MSG);
+            System.out.println(e.getMessage());
             return;
         }
 
         boolean add = books.add(book);
-        assert(add);
+        assert (add);
     }
 
     /**
@@ -143,12 +167,12 @@ public class EStoreSearch {
 
     private double parsePrice(String userString) {
         double price;
-        
+
         String[] userTokens = userString.split(" +");
         if (userTokens.length != 1) {
             throw new IllegalArgumentException(Product.INVALID_PRICE);
         }
-        
+
         try {
             price = Double.parseDouble(userString);
         } catch (Exception e) {
@@ -158,10 +182,10 @@ public class EStoreSearch {
         if (price <= 0) {
             throw new IllegalArgumentException(Product.INVALID_PRICE);
         }
-        
+
         return price;
     }
-    
+
     /**
      * Gets an integer from the user
      *
