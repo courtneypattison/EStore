@@ -2,7 +2,7 @@ package estoresearch;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * @author Courtney Bodi
@@ -66,7 +66,7 @@ public class EStoreSearch {
                 + "(2) Add electronic");
     }
     
-    private void promptUserSetField(Book book, String prompt, BiConsumer<Book, String> setMethod) {
+    private void promptUserSetField(String prompt, Consumer<String> setMethod) {
         int numTries = 0;
         boolean exceptionFlag;
 
@@ -74,7 +74,7 @@ public class EStoreSearch {
             exceptionFlag = false;
             System.out.println(prompt);
             try {
-                setMethod.accept(book, scanner.nextLine());
+                setMethod.accept(scanner.nextLine());
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
                 numTries++;
@@ -90,32 +90,20 @@ public class EStoreSearch {
         Book book = new Book();
         
         try {
-            promptUserSetField(book, "Enter book id:", Book::setId);
-            promptUserSetField(book, "Enter book name:", Book::setName);
-            promptUserSetField(book, "Enter book year:",
-                (Book bk, String userString) -> {
-                    int year;
-                    try {
-                        year = parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR);
-                    } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException(e.getMessage());
-                    }
-                    bk.setYear(year);});
-            promptUserSetField(book, "Enter book price:",
-                (Book bk, String userString) -> {
-                    double price;
-                    try {
-                        price = parsePrice(userString);
-                    } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException(e.getMessage());
-                    }
-                    bk.setPrice(price);});
+            promptUserSetField("Enter book id:", (String userString) -> book.setId(userString));
+            promptUserSetField("Enter book name:", (String userString) -> book.setName(userString));
+            promptUserSetField("Enter book year:",
+                (String userString) -> book.setYear(parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR)));
+            promptUserSetField("Enter book price:", (String userString) -> book.setPrice(parsePrice(userString)));
+            promptUserSetField("Enter book author:", (String userString) -> book.setAuthor(userString));
+            promptUserSetField("Enter book publisher:", (String userString) -> book.setPublisher(userString));
         } catch (IllegalArgumentException e) {
             System.out.println(MAX_TRIES_MSG);
             return;
         }
 
-        this.books.add(book);
+        boolean add = books.add(book);
+        assert(add);
     }
 
     /**
@@ -184,17 +172,17 @@ public class EStoreSearch {
 
         String[] userTokens = userString.split(" +");
         if (userTokens.length != 1) {
-            throw new IllegalArgumentException(INVALID_CHOICE);
+            throw new IllegalArgumentException("Invalid input: only enter one number.");
         }
 
         try {
             userInt = Integer.parseInt(userString);
         } catch (Exception e) {
-            throw new IllegalArgumentException(INVALID_CHOICE);
+            throw new IllegalArgumentException("Invalid input: enter an integer.");
         }
 
         if (userInt < min || userInt > max) {
-            throw new IllegalArgumentException(INVALID_CHOICE);
+            throw new IllegalArgumentException("Invalid input: enter a number between " + min + " and " + max);
         }
 
         return userInt;
