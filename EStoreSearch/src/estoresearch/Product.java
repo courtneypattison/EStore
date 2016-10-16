@@ -9,6 +9,9 @@ public class Product {
     public static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
     public static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
     public static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
+    
+    public static final int MIN_YEAR = 1000;
+    public static final int MAX_YEAR = 9999;
 
     public static final int ID_LENGTH = 6;
 
@@ -83,7 +86,7 @@ public class Product {
     public Product() {
         id = "000000";
         name = " ";
-        year = 1000;
+        year = MIN_YEAR;
         price = 0.0;
     }
 
@@ -167,7 +170,7 @@ public class Product {
      * @return whether or not the year is valid
      */
     private boolean validateYear(int year) {
-        return year > 1000 && year < 9999;
+        return year > MIN_YEAR && year < MAX_YEAR;
     }
 
     /**
