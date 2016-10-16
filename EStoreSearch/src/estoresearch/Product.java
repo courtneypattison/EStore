@@ -5,10 +5,10 @@ package estoresearch;
  */
 public class Product {
 
-    private static final String INVALID_ID = "Invalid input: the ID must be a six digit long number.";
-    private static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
-    private static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
-    private static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
+    public static final String INVALID_ID = "Invalid input: the ID must be a six digit long number.";
+    public static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
+    public static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
+    public static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
 
     public static final int ID_LENGTH = 6;
 
@@ -81,8 +81,9 @@ public class Product {
      * Default Product constructor
      */
     public Product() {
-        id = name = "";
-        year = 0;
+        id = "000000";
+        name = " ";
+        year = 1000;
         price = 0.0;
     }
 

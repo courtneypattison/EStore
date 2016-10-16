@@ -5,8 +5,8 @@ package estoresearch;
  */
 public class Book extends Product {
 
-    private static final String INVALID_AUTHOR = "Invalid input: the author must have at least one character.";
-    private static final String INVALID_PUBLISHER = "Invalid input: the publisher must have at least one character.";
+    public static final String INVALID_AUTHOR = "Invalid input: the author must have at least one character.";
+    public static final String INVALID_PUBLISHER = "Invalid input: the publisher must have at least one character.";
 
     private String author, publisher;
 
@@ -48,8 +48,8 @@ public class Book extends Product {
     }
     
     public Book() {
-        super("", "", 0, 0.0);
-        author = publisher = "";
+        super();
+        author = publisher = " ";
     }
 
     /**
@@ -107,6 +107,8 @@ public class Book extends Product {
         
         System.out.println("Book Class Testing" + System.lineSeparator()
                 + "Prints true when test is passed, false otherwise" + System.lineSeparator());
+        
+        Book book0 = new Book();
         
         try {
             book1 = new Book("000000", "foo", 1990, 200.00, "hello", "yo");

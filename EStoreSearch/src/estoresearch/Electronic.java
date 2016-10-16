@@ -5,7 +5,7 @@ package estoresearch;
  */
 public class Electronic extends Product {
 
-    private static final String INVALID_MAKER = "Invalid input: the maker must have at least one character.";
+    public static final String INVALID_MAKER = "Invalid input: the maker must have at least one character.";
 
     private String maker;
 
@@ -43,7 +43,7 @@ public class Electronic extends Product {
      */
     public Electronic() {
         super();
-        maker = "";
+        maker = " ";
     }
 
     /**
