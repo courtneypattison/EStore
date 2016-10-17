@@ -20,7 +20,7 @@ public class Electronic extends Product {
      */
     public Electronic(String id, String name, int year, double price, String maker) {
         super(id, name, year, price);
-        if (validateString(maker)) {
+        if (maker != null) {
             this.maker = maker;
         } else {
             throw new IllegalArgumentException(INVALID_MAKER);
@@ -43,7 +43,7 @@ public class Electronic extends Product {
      */
     public Electronic() {
         super();
-        maker = " ";
+        maker = "";
     }
 
     /**
@@ -61,7 +61,7 @@ public class Electronic extends Product {
      * @param maker the maker to set
      */
     public void setMaker(String maker) {
-        if (validateString(maker)) {
+        if (maker != null) {
             this.maker = maker;
         } else {
             throw new IllegalArgumentException(INVALID_MAKER);

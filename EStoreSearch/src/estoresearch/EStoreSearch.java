@@ -86,27 +86,31 @@ public class EStoreSearch {
         } while (exceptionFlag);
     }
 
-    private boolean checkIfUniqueId(Book newBook) {
+    private boolean checkIfUniqueId(Product product) {
         for (Book book : books) {
-            if (newBook.getId().equals(book.getId())) {
+            if (product.getId().equals(book.getId())) {
+                System.out.println("ID already exists!");
+                return false;
+            }
+        }
+        for (Electronic electronic : electronics) {
+            if (product.getId().equals(electronic.getId())) {
                 System.out.println("ID already exists!");
                 return false;
             }
         }
         return true;
     }
-
-    private void addBook() {
-        Book book = new Book();
-
+    
+    private void populateProduct(Product product, String productName) {
         try {
             int numTries = 0;
             boolean unique;
             
             do {
-                promptUserSetField("Enter book id:", (String userString) -> book.setId(userString));
+                promptUserSetField("Enter " + productName + " id:", (String userString) -> product.setId(userString));
                 
-                unique = checkIfUniqueId(book);
+                unique = checkIfUniqueId(product);
                 if (!unique) {
                     numTries++;
                     if (numTries == MAX_TRIES) {
@@ -115,10 +119,22 @@ public class EStoreSearch {
                 }
             } while (!unique);
 
-            promptUserSetField("Enter book name:", (String userString) -> book.setName(userString));
-            promptUserSetField("Enter book year:",
-                (String userString) -> book.setYear(parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR)));
-            promptUserSetField("Enter book price:", (String userString) -> book.setPrice(parsePrice(userString)));
+            promptUserSetField("Enter " + productName + " name:", (String userString) -> product.setName(userString));
+            promptUserSetField("Enter " + productName + " year:",
+                (String userString) -> product.setYear(parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR)));
+            promptUserSetField("Enter " + productName + " price:", (String userString) -> product.setPrice(parsePrice(userString)));
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    private void addBook() {
+        Book book = new Book();
+
+        populateProduct(book, "book");
+        
+        try {
             promptUserSetField("Enter book author:", (String userString) -> book.setAuthor(userString));
             promptUserSetField("Enter book publisher:", (String userString) -> book.setPublisher(userString));
         } catch (IllegalArgumentException e) {
@@ -127,6 +143,22 @@ public class EStoreSearch {
         }
 
         boolean add = books.add(book);
+        assert (add);
+    }
+    
+    private void addElectronic() {
+        Electronic electronic = new Electronic();
+
+        populateProduct(electronic, "electronic");
+        
+        try {
+            promptUserSetField("Enter electronic maker:", (String userString) -> electronic.setMaker(userString));
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        boolean add = electronics.add(electronic);
         assert (add);
     }
 
@@ -156,7 +188,7 @@ public class EStoreSearch {
                     addBook();
                     break;
                 case ADD_ELECTRONIC:
-                    System.out.println("ADD ELECTRONIC Case");
+                    addElectronic();
                     break;
                 default:
                     System.out.println(INVALID_CHOICE);
@@ -168,9 +200,13 @@ public class EStoreSearch {
     private double parsePrice(String userString) {
         double price;
 
-        String[] userTokens = userString.split(" +");
+        String[] userTokens = userString.split("\\s+");
         if (userTokens.length != 1) {
             throw new IllegalArgumentException(Product.INVALID_PRICE);
+        }
+        
+        if (userString.equals("")) {
+            return Product.NO_PRICE;
         }
 
         try {
@@ -202,7 +238,7 @@ public class EStoreSearch {
         try {
             userInt = Integer.parseInt(userString);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid input: enter an integer.");
+            throw new IllegalArgumentException("Invalid input");
         }
 
         if (userInt < min || userInt > max) {
@@ -210,6 +246,16 @@ public class EStoreSearch {
         }
 
         return userInt;
+    }
+    
+    private void executeSearch() {
+        Product product = new Product();
+        
+        System.out.println("Enter product ID to be matched, or leave blank:");
+        product.setId(scanner.nextLine());
+        System.out.println("Enter keyword to be searched in name, or leave blank:");
+        String name = scanner.nextLine();
+        
     }
 
     /**
@@ -238,7 +284,7 @@ public class EStoreSearch {
                     executeAddMenuLoop();
                     break;
                 case SEARCH:
-                    System.out.println("SEARCH Case");
+                    executeSearch();
                     break;
                 default:
                     System.out.println(INVALID_CHOICE);
@@ -258,7 +304,13 @@ public class EStoreSearch {
 
         System.out.println("Welcome to EStore Search" + System.lineSeparator());
         eStoreSearch.executeMainMenuLoop();
-        System.out.println(eStoreSearch.books.get(0).toString());
+        
+        for (Book book : books) {
+            System.out.println(book.toString());
+        }
+        for (Electronic electronic : electronics) {
+            System.out.println(electronic.toString());
+        }
     }
 
 }

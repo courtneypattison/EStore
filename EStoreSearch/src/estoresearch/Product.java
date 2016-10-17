@@ -10,6 +10,8 @@ public class Product {
     public static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
     public static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
     
+    public static final int NO_PRICE = -1;
+
     public static final int MIN_YEAR = 1000;
     public static final int MAX_YEAR = 9999;
 
@@ -105,7 +107,7 @@ public class Product {
      * @param id
      * @return whether or not the id is valid
      */
-    private boolean validateId(String id) {
+    public boolean validateId(String id) {
         return id != null && id.matches("^\\d+$") && id.length() == ID_LENGTH;
     }
 
@@ -138,7 +140,7 @@ public class Product {
      * @return whether or not the string is valid
      */
     public boolean validateString(String string) {
-        return string != null && !id.matches("");
+        return string != null && string.length() > 0;
     }
 
     /**
@@ -202,7 +204,8 @@ public class Product {
      * @return whether or not the price is valid
      */
     private boolean validatePrice(double price) {
-        return price >= 0;
+        return true;
+        //return price >= 0;
     }
 
     /**
@@ -238,10 +241,17 @@ public class Product {
      */
     @Override
     public String toString() {
-        return id + System.lineSeparator()
-                + name + System.lineSeparator()
-                + year + System.lineSeparator()
-                + price + System.lineSeparator();
+        if (price == NO_PRICE) {
+            return id + System.lineSeparator()
+                    + name + System.lineSeparator()
+                    + year + System.lineSeparator()
+                    + "" + System.lineSeparator();
+        } else {
+            return id + System.lineSeparator()
+                    + name + System.lineSeparator()
+                    + year + System.lineSeparator()
+                    + price + System.lineSeparator();
+        }
     }
 
     /**
@@ -331,11 +341,11 @@ public class Product {
         }
 
         try {
-            product3.setPrice(-1);
+            product3.setPrice(NO_PRICE);
         } catch (IllegalArgumentException e) {
             pass = true;
         } finally {
-            System.out.println(pass + "\tproduct3.setPrice(-1);");
+            System.out.println(pass + "\tproduct3.setPrice(NO_PRICE);");
         }
 
         pass = !product1.equals(product2);

@@ -23,13 +23,13 @@ public class Book extends Product {
     public Book(String id, String name, int year, double price, String author, String publisher) {
         super(id, name, year, price);
 
-        if (validateString(author)) {
+        if (author != null) {
             this.author = author;
         } else {
             throw new IllegalArgumentException(INVALID_AUTHOR);
         }
 
-        if (validateString(publisher)) {
+        if (publisher != null) {
             this.publisher = publisher;
         } else {
             throw new IllegalArgumentException(INVALID_PUBLISHER);
@@ -49,7 +49,7 @@ public class Book extends Product {
     
     public Book() {
         super();
-        author = publisher = " ";
+        author = publisher = "";
     }
 
     /**
@@ -67,7 +67,7 @@ public class Book extends Product {
      * @param author the author to set
      */
     public void setAuthor(String author) {
-        if (validateString(author)) {
+        if (author != null) {
             this.author = author;
         } else {
             throw new IllegalArgumentException(INVALID_AUTHOR);
@@ -89,7 +89,7 @@ public class Book extends Product {
      * @param publisher the publisher to set
      */
     public void setPublisher(String publisher) {
-        if (validateString(publisher)) {
+        if (publisher != null) {
             this.publisher = publisher;
         } else {
             throw new IllegalArgumentException(INVALID_PUBLISHER);
