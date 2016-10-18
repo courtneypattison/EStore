@@ -254,7 +254,11 @@ public class EStoreSearch {
         System.out.println("Enter product ID to be matched, or leave blank:");
         String id = scanner.nextLine();
         if (!id.equals("")) {
-            product.setId(scanner.nextLine());
+            try {
+                product.setId(id);
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
             Product matchingProduct = checkIfIdExists(product);
             if (matchingProduct != null) {
                 matchingProducts.add(matchingProduct);
@@ -305,7 +309,6 @@ public class EStoreSearch {
         String timePeriod = scanner.nextLine();
 
         if (!timePeriod.equals("")) {
-            System.out.println("index: " + timePeriod.indexOf("-"));
             switch (timePeriod.indexOf("-")) {
                 case 0:
                     if (timePeriod.length() != 5) {
@@ -397,11 +400,48 @@ public class EStoreSearch {
 
     private void executeSearch() {
         ArrayList<Product> matchingProducts = new ArrayList<>();
+        ArrayList<Product> matchingIdProducts = new ArrayList<>();
+        ArrayList<Product> matchingKeywordProducts = new ArrayList<>();
+        ArrayList<Product> matchingTimePeriodProducts = new ArrayList<>();
 
-        promptUserAddMatchingId(matchingProducts);
-        promptUserAddMatchingKeyword(matchingProducts);
-        promptUserAddMatchingTimePeriod(matchingProducts);
+        promptUserAddMatchingId(matchingIdProducts);
+        promptUserAddMatchingKeyword(matchingKeywordProducts);
+        promptUserAddMatchingTimePeriod(matchingTimePeriodProducts);
 
+        if (matchingIdProducts.size() == 1) {
+            if (matchingKeywordProducts.size() > 0) {
+                for (Product matchingKeywordProduct : matchingKeywordProducts) {
+                    if (matchingIdProducts.get(0).equals(matchingKeywordProduct)) {
+                        matchingProducts.add(matchingKeywordProduct);
+                    }
+                }
+            }
+            if (matchingTimePeriodProducts.size() > 0) {
+                for (Product matchingTimePeriodProduct : matchingTimePeriodProducts) {
+                    if (matchingIdProducts.get(0).equals(matchingTimePeriodProduct)) {
+                        matchingProducts.add(matchingTimePeriodProduct);
+                    }
+                }
+            }
+        } else if (matchingKeywordProducts.size() > 0) {
+            if (matchingTimePeriodProducts.size() > 0) {
+                for (Product matchingKeywordProduct : matchingKeywordProducts) {
+                    for (Product matchingTimePeriodProduct : matchingTimePeriodProducts) {
+                        if (matchingKeywordProduct.equals(matchingTimePeriodProduct)) {
+                            matchingProducts.add(matchingKeywordProduct);
+                        }
+                    }
+                }
+            } else {
+                for (Product matchingKeywordProduct : matchingKeywordProducts) {
+                    matchingProducts.add(matchingKeywordProduct);
+                }
+            }
+        } else {
+            for (Product matchingTimePeriodProduct : matchingTimePeriodProducts) {
+                matchingProducts.add(matchingTimePeriodProduct);
+            }
+        }
         printMatchingProducts(matchingProducts);
     }
 
