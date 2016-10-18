@@ -28,6 +28,7 @@ public class EStoreSearch {
 
     private static final int MAX_TRIES = 3;
     private static final String MAX_TRIES_MSG = "Too many attempts!";
+
     private static final String INVALID_CHOICE = "Invalid input: you must enter 0, 1, or 2.";
     private static final String INVALID_TIME_PERIOD = "Invalid input: time period must be in the format of -1999, 1999-, or 1999-2000.";
 
@@ -75,9 +76,9 @@ public class EStoreSearch {
 
     /**
      * Prompts user for string to add to field specified by set method
-     * 
+     *
      * @param prompt
-     * @param setMethod 
+     * @param setMethod
      */
     private void promptUserSetField(String prompt, Consumer<String> setMethod) {
         int numTries = 0;
@@ -101,9 +102,9 @@ public class EStoreSearch {
 
     /**
      * Checks if product ID already exists in EStore
-     * 
+     *
      * @param product
-     * @return 
+     * @return
      */
     private Product checkIfIdExists(Product product) {
         for (Book book : books) {
@@ -121,9 +122,9 @@ public class EStoreSearch {
 
     /**
      * Sets product id, name, year, and price if applicable
-     * 
+     *
      * @param product
-     * @param productName 
+     * @param productName
      */
     private void populateProduct(Product product, String productName) {
         try {
@@ -148,7 +149,7 @@ public class EStoreSearch {
                     (String userString) -> product.setYear(parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR)));
             promptUserSetField("Enter " + productName + " price:", (String userString) -> product.setPrice(parsePrice(userString)));
         } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
         }
 
     }
@@ -159,7 +160,12 @@ public class EStoreSearch {
     private void addBook() {
         Book book = new Book();
 
-        populateProduct(book, "book");
+        try {
+            populateProduct(book, "book");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
         try {
             promptUserSetField("Enter book author:", (String userString) -> book.setAuthor(userString));
@@ -179,7 +185,12 @@ public class EStoreSearch {
     private void addElectronic() {
         Electronic electronic = new Electronic();
 
-        populateProduct(electronic, "electronic");
+        try {
+            populateProduct(electronic, "electronic");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
         try {
             promptUserSetField("Enter electronic maker:", (String userString) -> electronic.setMaker(userString));
@@ -229,7 +240,7 @@ public class EStoreSearch {
 
     /**
      * Validates and parses price into an integer
-     * 
+     *
      * @param userString
      * @return valid price
      */
@@ -286,32 +297,45 @@ public class EStoreSearch {
 
     /**
      * Prompt user to search by ID and adds product with corresponding ID
-     * 
-     * @param matchingProducts 
+     *
+     * @param matchingProducts
      */
     private void promptUserAddMatchingId(ArrayList<Product> matchingProducts) {
+        int numTries = 0;
+        boolean exceptionFlag;
+
         Product product = new Product();
 
-        System.out.println("Enter product ID to be matched, or leave blank:");
-        String id = scanner.nextLine();
-        if (!id.equals("")) {
-            try {
-                product.setId(id);
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+        do {
+            exceptionFlag = false;
+            System.out.println("Enter product ID to be matched, or leave blank:");
+            String id = scanner.nextLine();
+            if (!id.equals("")) {
+                try {
+                    product.setId(id);
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                    numTries++;
+                    exceptionFlag = true;
+                    if (numTries == MAX_TRIES) {
+                        throw new IllegalArgumentException(MAX_TRIES_MSG);
+                    }
+                    continue;
+                }
+                Product matchingProduct = checkIfIdExists(product);
+                if (matchingProduct != null) {
+                    matchingProducts.add(matchingProduct);
+                }
             }
-            Product matchingProduct = checkIfIdExists(product);
-            if (matchingProduct != null) {
-                matchingProducts.add(matchingProduct);
-            }
-        }
+
+        } while (exceptionFlag);
     }
 
     /**
      * Prompts user to input keywords, then searches products for keywords in
      * names, and adds product to matchingProducts if there is a match
-     * 
-     * @param matchingProducts 
+     *
+     * @param matchingProducts
      */
     private void promptUserAddMatchingKeyword(ArrayList<Product> matchingProducts) {
         System.out.println("Enter keyword to be searched in name, or leave blank:");
@@ -354,92 +378,110 @@ public class EStoreSearch {
     /**
      * Prompts user to input time period and adds products that fall within that
      * time period to the matchingProducts
-     * 
-     * @param matchingProducts 
+     *
+     * @param matchingProducts
      */
     private void promptUserAddMatchingTimePeriod(ArrayList<Product> matchingProducts) {
-        System.out.println("Enter time period, e.g., 1999-2001, or leave blank:");
-        String timePeriod = scanner.nextLine();
+        int numTries = 0;
+        boolean exceptionFlag;
 
-        if (!timePeriod.equals("")) {
-            switch (timePeriod.indexOf("-")) {
-                case 0:
-                    if (timePeriod.length() != 5) {
+        do {
+            exceptionFlag = false;
+
+            System.out.println("Enter time period, e.g., 1999-2001, or leave blank:");
+            String timePeriod = scanner.nextLine();
+
+            if (!timePeriod.equals("")) {
+                switch (timePeriod.indexOf("-")) {
+                    case 0:
+                        if (timePeriod.length() != 5) {
+                            System.out.println(INVALID_TIME_PERIOD);
+                            numTries++;
+                            exceptionFlag = true;
+                        } else {
+                            for (Book book : books) {
+                                if (book.getYear() <= parseUserInt(timePeriod.substring(1, 5), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(book);
+                                }
+                            }
+
+                            for (Electronic electronic : electronics) {
+                                if (electronic.getYear() <= parseUserInt(timePeriod.substring(1, 5), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(electronic);
+                                }
+                            }
+                        }
+                        break;
+                    case 4:
+                        if (timePeriod.length() == 5) {
+                            for (Book book : books) {
+                                if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(book);
+                                }
+                            }
+
+                            for (Electronic electronic : electronics) {
+                                if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(electronic);
+                                }
+                            }
+                        } else if (timePeriod.length() == 9) {
+                            for (Book book : books) {
+                                if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)
+                                        && book.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(book);
+                                }
+                            }
+
+                            for (Electronic electronic : electronics) {
+                                if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)
+                                        && electronic.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(electronic);
+                                }
+                            }
+                        } else {
+                            System.out.println(INVALID_TIME_PERIOD);
+                            numTries++;
+                            exceptionFlag = true;
+                        }
+                        break;
+                    case -1:
+                        if (timePeriod.length() == 4) {
+                            for (Book book : books) {
+                                if (book.getYear() == parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(book);
+                                }
+                            }
+
+                            for (Electronic electronic : electronics) {
+                                if (electronic.getYear() == parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(electronic);
+                                }
+                            }
+                        } else {
+                            System.out.println(INVALID_TIME_PERIOD);
+                            numTries++;
+                            exceptionFlag = true;
+                        }
+                        break;
+                    default:
                         System.out.println(INVALID_TIME_PERIOD);
-                    } else {
-                        for (Book book : books) {
-                            if (book.getYear() <= parseUserInt(timePeriod.substring(1, 5), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(book);
-                            }
-                        }
+                        numTries++;
+                        exceptionFlag = true;
+                        break;
+                }
 
-                        for (Electronic electronic : electronics) {
-                            if (electronic.getYear() <= parseUserInt(timePeriod.substring(1, 5), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(electronic);
-                            }
-                        }
-                    }
-                    break;
-                case 4:
-                    if (timePeriod.length() == 5) {
-                        for (Book book : books) {
-                            if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(book);
-                            }
-                        }
-
-                        for (Electronic electronic : electronics) {
-                            if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(electronic);
-                            }
-                        }
-                    } else if (timePeriod.length() == 9) {
-                        for (Book book : books) {
-                            if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR) 
-                                    && book.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(book);
-                            }
-                        }
-
-                        for (Electronic electronic : electronics) {
-                            if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)
-                                    && electronic.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(electronic);
-                            }
-                        }
-                    } else {
-                        System.out.println(INVALID_TIME_PERIOD);
-                    }
-                    break;
-                case -1:
-                    if (timePeriod.length() == 4) {
-                        for (Book book : books) {
-                            if (book.getYear() == parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(book);
-                            }
-                        }
-
-                        for (Electronic electronic : electronics) {
-                            if (electronic.getYear() == parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                matchingProducts.add(electronic);
-                            }
-                        }
-                    } else {
-                        System.out.println(INVALID_TIME_PERIOD);
-                    }
-                    break;
-                default:
-                    System.out.println(INVALID_TIME_PERIOD);
-                    break;
             }
-
-        }
+            if (numTries == MAX_TRIES) {
+                throw new IllegalArgumentException(MAX_TRIES_MSG);
+            }
+        } while (exceptionFlag);
     }
 
     /**
      * Prints matching products
-     * 
-     * @param matchingProducts 
+     *
+     * @param matchingProducts
      */
     private void printMatchingProducts(ArrayList<Product> matchingProducts) {
         if (matchingProducts.isEmpty()) {
@@ -465,9 +507,20 @@ public class EStoreSearch {
         ArrayList<Product> matchingKeywordProducts = new ArrayList<>();
         ArrayList<Product> matchingTimePeriodProducts = new ArrayList<>();
 
-        promptUserAddMatchingId(matchingIdProducts);
+        try {
+            promptUserAddMatchingId(matchingIdProducts);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         promptUserAddMatchingKeyword(matchingKeywordProducts);
+
+        try {
         promptUserAddMatchingTimePeriod(matchingTimePeriodProducts);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
         if (matchingIdProducts.size() == 1) {
             if (matchingKeywordProducts.size() > 0) {
@@ -483,6 +536,9 @@ public class EStoreSearch {
                         matchingProducts.add(matchingTimePeriodProduct);
                     }
                 }
+            }
+            if (matchingKeywordProducts.size() == 0 && matchingTimePeriodProducts.size() == 0) {
+                matchingProducts.add(matchingIdProducts.get(0));
             }
         } else if (matchingKeywordProducts.size() > 0) {
             if (matchingTimePeriodProducts.size() > 0) {
@@ -527,6 +583,7 @@ public class EStoreSearch {
             userChoice = MainMenuOption.values()[userInt];
             switch (userChoice) {
                 case QUIT:
+                    System.out.println("Thank you for using EStoreSearch!");
                     break;
                 case ADD:
                     executeAddMenuLoop();
