@@ -172,7 +172,7 @@ public class Product {
      * @return whether or not the year is valid
      */
     private boolean validateYear(int year) {
-        return year > MIN_YEAR && year < MAX_YEAR;
+        return year >= MIN_YEAR && year <= MAX_YEAR;
     }
 
     /**
