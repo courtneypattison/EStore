@@ -1,6 +1,8 @@
 package estoresearch;
 
 /**
+ * Gets and sets id, name, year, price, and maker of electronic
+ * 
  * @author Courtney Bodi
  */
 public class Electronic extends Product {
@@ -12,11 +14,11 @@ public class Electronic extends Product {
     /**
      * Electronic constructor with all members
      *
-     * @param id
-     * @param name
-     * @param year
-     * @param price
-     * @param maker
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param year product released
+     * @param price of product in dollars CAD
+     * @param maker of product string
      */
     public Electronic(String id, String name, int year, double price, String maker) {
         super(id, name, year, price);
@@ -30,9 +32,9 @@ public class Electronic extends Product {
     /**
      * Electronic constructor with mandatory members
      *
-     * @param id
-     * @param name
-     * @param year
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param year product released
      */
     public Electronic(String id, String name, int year) {
         super(id, name, year);
@@ -71,7 +73,7 @@ public class Electronic extends Product {
     /**
      * Determines if Electronics are equal
      *
-     * @param other
+     * @param other electronic object
      * @return whether or not the Electronics are equal
      */
     public boolean equals(Electronic other) {

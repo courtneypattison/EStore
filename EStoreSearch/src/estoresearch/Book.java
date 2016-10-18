@@ -1,6 +1,7 @@
 package estoresearch;
 
 /**
+ * Gets and sets id, name, year, price, author, and publisher of book
  * @author Courtney Bodi
  */
 public class Book extends Product {
@@ -13,12 +14,12 @@ public class Book extends Product {
     /**
      * Book constructor with all fields
      *
-     * @param id
-     * @param name
-     * @param year
-     * @param price
-     * @param author
-     * @param publisher
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param year product released
+     * @param price of product in dollars CAD
+     * @param author of product with first and last name
+     * @param publisher of product name
      */
     public Book(String id, String name, int year, double price, String author, String publisher) {
         super(id, name, year, price);
@@ -39,9 +40,9 @@ public class Book extends Product {
     /**
      * Book constructor with mandatory fields
      *
-     * @param id
-     * @param name
-     * @param year
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param year product released
      */
     public Book(String id, String name, int year) {
         super(id, name, year);

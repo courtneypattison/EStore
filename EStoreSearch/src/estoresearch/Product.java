@@ -1,6 +1,7 @@
 package estoresearch;
 
 /**
+ * Gets and sets id, name, year, and price of product
  * @author Courtney Bodi
  */
 public class Product {
@@ -24,10 +25,10 @@ public class Product {
     /**
      * Product constructor with all members
      *
-     * @param id
-     * @param name
-     * @param year
-     * @param price
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param year product released
+     * @param price of product in dollars CAD
      */
     public Product(String id, String name, int year, double price) {
         if (validateId(id)) {
@@ -58,9 +59,9 @@ public class Product {
     /**
      * Product constructor with all mandatory members
      *
-     * @param id
-     * @param name
-     * @param year
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param year product released
      */
     public Product(String id, String name, int year) {
         if (validateId(id)) {
@@ -104,7 +105,7 @@ public class Product {
     /**
      * Validate id string
      *
-     * @param id
+     * @param id is a unique 6 digit string
      * @return whether or not the id is valid
      */
     public boolean validateId(String id) {
@@ -136,7 +137,7 @@ public class Product {
     /**
      * Validate string
      *
-     * @param string
+     * @param string is any string that is not null or empty
      * @return whether or not the string is valid
      */
     public boolean validateString(String string) {
@@ -168,7 +169,7 @@ public class Product {
     /**
      * Validate year
      *
-     * @param year
+     * @param year in format 0000
      * @return whether or not the year is valid
      */
     private boolean validateYear(int year) {
@@ -200,12 +201,12 @@ public class Product {
     /**
      * Validate price
      *
-     * @param price
+     * @param price of product in dollars
      * @return whether or not the price is valid
      */
     private boolean validatePrice(double price) {
-        return true;
-        //return price >= 0;
+        //return true;
+        return price >= NO_PRICE;
     }
 
     /**
@@ -224,7 +225,7 @@ public class Product {
     /**
      * Check if Products are equal
      *
-     * @param other
+     * @param other product object
      * @return whether or not the Products are equal
      */
     public boolean equals(Product other) {

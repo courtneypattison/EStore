@@ -5,6 +5,8 @@ import java.util.Scanner;
 import java.util.function.Consumer;
 
 /**
+ * Adds and searches books and electronics
+ * 
  * @author Courtney Bodi
  */
 public class EStoreSearch {
@@ -40,8 +42,8 @@ public class EStoreSearch {
     /**
      * EStoreSearch constructor with all fields
      *
-     * @param books
-     * @param electronics
+     * @param books in a list
+     * @param electronics in a list
      */
     public EStoreSearch(ArrayList<Book> books, ArrayList<Electronic> electronics) {
         this.books = books;
