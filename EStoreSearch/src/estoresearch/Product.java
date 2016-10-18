@@ -350,15 +350,5 @@ public class Product {
 
         pass = !product1.equals(product2);
         System.out.println(pass + "\t!product3.equals(product1)");
-
-        pass = product3.toString().equals(product3.id + System.lineSeparator()
-                + product3.name + System.lineSeparator()
-                + product3.year + System.lineSeparator()
-                + product3.price + System.lineSeparator());
-        System.out.println(pass + "\tproduct3.toString().equals(product3.id" + System.lineSeparator()
-                + "        + product3.name" + System.lineSeparator()
-                + "        + product3.year" + System.lineSeparator()
-                + "        + product3.price");
-
     }
 }

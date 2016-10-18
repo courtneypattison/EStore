@@ -9,10 +9,16 @@ import java.util.function.Consumer;
  */
 public class EStoreSearch {
 
+    /**
+     * Main menu selection options
+     */
     public enum MainMenuOption {
         QUIT, ADD, SEARCH
     }
 
+    /**
+     * Add menu selection options
+     */
     public enum AddMenuOption {
         QUIT, ADD_BOOK, ADD_ELECTRONIC
     }
@@ -67,6 +73,12 @@ public class EStoreSearch {
                 + "(2) Add electronic");
     }
 
+    /**
+     * Prompts user for string to add to field specified by set method
+     * 
+     * @param prompt
+     * @param setMethod 
+     */
     private void promptUserSetField(String prompt, Consumer<String> setMethod) {
         int numTries = 0;
         boolean exceptionFlag;
@@ -87,6 +99,12 @@ public class EStoreSearch {
         } while (exceptionFlag);
     }
 
+    /**
+     * Checks if product ID already exists in EStore
+     * 
+     * @param product
+     * @return 
+     */
     private Product checkIfIdExists(Product product) {
         for (Book book : books) {
             if (product.getId().equals(book.getId())) {
@@ -101,6 +119,12 @@ public class EStoreSearch {
         return null;
     }
 
+    /**
+     * Sets product id, name, year, and price if applicable
+     * 
+     * @param product
+     * @param productName 
+     */
     private void populateProduct(Product product, String productName) {
         try {
             int numTries = 0;
@@ -129,6 +153,9 @@ public class EStoreSearch {
 
     }
 
+    /**
+     * Adds book to books list
+     */
     private void addBook() {
         Book book = new Book();
 
@@ -146,6 +173,9 @@ public class EStoreSearch {
         assert (add);
     }
 
+    /**
+     * Adds electronic to electronics list
+     */
     private void addElectronic() {
         Electronic electronic = new Electronic();
 
@@ -197,6 +227,12 @@ public class EStoreSearch {
         } while (userChoice != AddMenuOption.QUIT);
     }
 
+    /**
+     * Validates and parses price into an integer
+     * 
+     * @param userString
+     * @return valid price
+     */
     private double parsePrice(String userString) {
         double price;
 
@@ -248,6 +284,11 @@ public class EStoreSearch {
         return userInt;
     }
 
+    /**
+     * Prompt user to search by ID and adds product with corresponding ID
+     * 
+     * @param matchingProducts 
+     */
     private void promptUserAddMatchingId(ArrayList<Product> matchingProducts) {
         Product product = new Product();
 
@@ -266,6 +307,12 @@ public class EStoreSearch {
         }
     }
 
+    /**
+     * Prompts user to input keywords, then searches products for keywords in
+     * names, and adds product to matchingProducts if there is a match
+     * 
+     * @param matchingProducts 
+     */
     private void promptUserAddMatchingKeyword(ArrayList<Product> matchingProducts) {
         System.out.println("Enter keyword to be searched in name, or leave blank:");
         String keyword = scanner.nextLine();
@@ -304,6 +351,12 @@ public class EStoreSearch {
         }
     }
 
+    /**
+     * Prompts user to input time period and adds products that fall within that
+     * time period to the matchingProducts
+     * 
+     * @param matchingProducts 
+     */
     private void promptUserAddMatchingTimePeriod(ArrayList<Product> matchingProducts) {
         System.out.println("Enter time period, e.g., 1999-2001, or leave blank:");
         String timePeriod = scanner.nextLine();
@@ -330,27 +383,27 @@ public class EStoreSearch {
                 case 4:
                     if (timePeriod.length() == 5) {
                         for (Book book : books) {
-                            if (parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR) <= book.getYear()) {
+                            if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
                                 matchingProducts.add(book);
                             }
                         }
 
                         for (Electronic electronic : electronics) {
-                            if (parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR) <= electronic.getYear()) {
+                            if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
                                 matchingProducts.add(electronic);
                             }
                         }
                     } else if (timePeriod.length() == 9) {
                         for (Book book : books) {
-                            if (parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR) <= book.getYear()
-                                    && parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR) >= book.getYear()) {
+                            if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR) 
+                                    && book.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
                                 matchingProducts.add(book);
                             }
                         }
 
                         for (Electronic electronic : electronics) {
-                            if (parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR) <= electronic.getYear()
-                                    && parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR) <= electronic.getYear()) {
+                            if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)
+                                    && electronic.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
                                 matchingProducts.add(electronic);
                             }
                         }
@@ -383,6 +436,11 @@ public class EStoreSearch {
         }
     }
 
+    /**
+     * Prints matching products
+     * 
+     * @param matchingProducts 
+     */
     private void printMatchingProducts(ArrayList<Product> matchingProducts) {
         if (matchingProducts.isEmpty()) {
             System.out.println("None of the products match your search criteria.");
@@ -398,6 +456,9 @@ public class EStoreSearch {
         }
     }
 
+    /**
+     * Performs search
+     */
     private void executeSearch() {
         ArrayList<Product> matchingProducts = new ArrayList<>();
         ArrayList<Product> matchingIdProducts = new ArrayList<>();
@@ -491,13 +552,6 @@ public class EStoreSearch {
 
         System.out.println("Welcome to EStore Search" + System.lineSeparator());
         eStoreSearch.executeMainMenuLoop();
-
-        for (Book book : books) {
-            System.out.println(book.toString());
-        }
-        for (Electronic electronic : electronics) {
-            System.out.println(electronic.toString());
-        }
     }
 
 }
