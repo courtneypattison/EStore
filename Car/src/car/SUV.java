@@ -79,5 +79,8 @@ public class SUV extends Car {
         this.tireBrand = tireBrand;
     }
     
-    
+    @Override
+    public String dataDump() {
+        return "SUV: " + getBrandAndModel().split("\\s")[1] + " " + getTireBrand(); 
+    }
 }

@@ -1,5 +1,7 @@
 package car;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -7,6 +9,48 @@ import java.util.Scanner;
  * @author Courtney Bodi
  */
 public class Car {
+
+    /**
+     * @return the year
+     */
+    public int getYear() {
+        return year;
+    }
+
+    /**
+     * @param year the year to set
+     */
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    /**
+     * @return the brandAndModel
+     */
+    public String getBrandAndModel() {
+        return brandAndModel;
+    }
+
+    /**
+     * @param brandAndModel the brandAndModel to set
+     */
+    public void setBrandAndModel(String brandAndModel) {
+        this.brandAndModel = brandAndModel;
+    }
+
+    /**
+     * @return the price
+     */
+    public int getPrice() {
+        return price;
+    }
+
+    /**
+     * @param price the price to set
+     */
+    public void setPrice(int price) {
+        this.price = price;
+    }
 
     enum MenuOption {
         NULL,
@@ -22,7 +66,7 @@ public class Car {
 
     public static final String NEW_LINE = System.lineSeparator();
 
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner keyboardScanner = new Scanner(System.in);
     private ArrayList<Car> cars = new ArrayList<>();
 
     private int year;
@@ -62,6 +106,8 @@ public class Car {
         brandAndModel = "";
         price = 0;
     }
+    
+    
 
     private void printMenu() {
         System.out.println("(1) Enter the info about a new vehicle (either a car or a SUV)." + NEW_LINE
@@ -80,7 +126,7 @@ public class Car {
         Car newCar;
 
         System.out.println("Enter vehicle brand and model:");
-        brandAndModel = scanner.nextLine();
+        brandAndModel = keyboardScanner.nextLine();
         String tokensCheck[] = brandAndModel.split(" +");
         if (tokensCheck.length != 2 || tokensCheck[0].matches("")) {
             System.out.println("Invalid input: You must enter a brand and model.");
@@ -88,7 +134,7 @@ public class Car {
         }
 
         System.out.println("Enter year:");
-        String yearString = scanner.nextLine();
+        String yearString = keyboardScanner.nextLine();
         if (yearString.matches("^\\d+$")) {
             year = Integer.parseInt(yearString);
         } else {
@@ -97,7 +143,7 @@ public class Car {
         }
 
         System.out.println("Enter price, or leave blank:");
-        String priceString = scanner.nextLine();
+        String priceString = keyboardScanner.nextLine();
         System.out.println("price: " + priceString);
         if (priceString.matches("^\\d+$")) {
             price = Integer.parseInt(priceString);
@@ -114,7 +160,7 @@ public class Car {
 
     private void printBrandAndModel() {
         for (Car car : cars) {
-            String tokens[] = car.brandAndModel.split(" +");
+            String tokens[] = car.getBrandAndModel().split(" +");
             System.out.println("Brand: " + tokens[0] + NEW_LINE
                     + "Model: " + tokens[1] + NEW_LINE);
         }
@@ -125,7 +171,7 @@ public class Car {
         double average = 0;
 
         for (Car car : cars) {
-            sum += car.price;
+            sum += car.getPrice();
         }
 
         if (cars.size() > 0) {
@@ -139,12 +185,55 @@ public class Car {
     private void printYears() {
         System.out.println("Vehicle years:");
         for (Car car : cars) {
-            System.out.println(car.year);
+            System.out.println(car.getYear());
+        }
+    }
+    
+    private void readAndParseInputFile() {
+        System.out.println("Enter the name of the input file:");
+        try {
+            File file = new File(keyboardScanner.nextLine());
+            Scanner fileScanner = new Scanner(file);
+            while (fileScanner.hasNextLine()) {
+                String[] carTokens = fileScanner.nextLine().split("\\s");
+                
+                if (Integer.parseInt(carTokens[4]) == 0) {
+                    Car car = new Car();
+                    car.setBrandAndModel(carTokens[0].concat(" " + carTokens[1]));
+                    car.setYear(Integer.parseInt(carTokens[2]));
+                    car.setPrice(Integer.parseInt(carTokens[3]));
+                    cars.add(car);
+                } else {
+                    SUV suv = new SUV();
+                    suv.setBrandAndModel(carTokens[0].concat(" " + carTokens[1]));
+                    suv.setYear(Integer.parseInt(carTokens[2]));
+                    suv.setPrice(Integer.parseInt(carTokens[3]));
+                    suv.setNumSeats(Integer.parseInt(carTokens[5]));
+                    suv.setIsAllTerrain(Boolean.parseBoolean(carTokens[6]));
+                    suv.setTireBrand(carTokens[7]);
+                    cars.add(suv);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Could not open file.");
         }
     }
 
-    private void dataDump() {
-        System.out.println(brandAndModel + " " + year + " " + price);
+    public String dataDump() {
+        return getBrandAndModel() + " " + getYear() + " " + getPrice();
+    }
+    
+    private void outputDataDumpToFile() {
+        try {
+            File outputFile = new File("./output.txt");
+            PrintWriter fileWriter = new PrintWriter(outputFile);
+            for (Car car : cars) {
+                fileWriter.println(car.dataDump());
+            }
+            fileWriter.close();
+        } catch (Exception e) {
+            System.out.println("Could not write to output.txt");
+        }
     }
 
     public void executeCommandLoop() {
@@ -153,7 +242,7 @@ public class Car {
         do {
             printMenu();
 
-            String userString = scanner.nextLine();
+            String userString = keyboardScanner.nextLine();
 
             if (userString.matches("[12345678]")) {
                 userChoice = MenuOption.values()[Integer.parseInt(userString)];
@@ -176,10 +265,15 @@ public class Car {
                     printYears();
                     break;
                 case READ_INPUT:
+                    readAndParseInputFile();
                     break;
                 case STD_DATA_DUMP:
+                    for (Car car : cars) {
+                        System.out.println(car.dataDump()); 
+                    }
                     break;
                 case FILE_DATA_DUMP:
+                    outputDataDumpToFile();
                     break;
                 case EXIT:
                     break;
