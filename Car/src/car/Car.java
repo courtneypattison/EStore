@@ -10,48 +10,6 @@ import java.util.Scanner;
  */
 public class Car {
 
-    /**
-     * @return the year
-     */
-    public int getYear() {
-        return year;
-    }
-
-    /**
-     * @param year the year to set
-     */
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    /**
-     * @return the brandAndModel
-     */
-    public String getBrandAndModel() {
-        return brandAndModel;
-    }
-
-    /**
-     * @param brandAndModel the brandAndModel to set
-     */
-    public void setBrandAndModel(String brandAndModel) {
-        this.brandAndModel = brandAndModel;
-    }
-
-    /**
-     * @return the price
-     */
-    public int getPrice() {
-        return price;
-    }
-
-    /**
-     * @param price the price to set
-     */
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
     enum MenuOption {
         NULL,
         ENTER_VEHICLE,
@@ -107,8 +65,48 @@ public class Car {
         price = 0;
     }
     
-    
+    /**
+     * @return the year
+     */
+    public int getYear() {
+        return year;
+    }
 
+    /**
+     * @param year the year to set
+     */
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    /**
+     * @return the brandAndModel
+     */
+    public String getBrandAndModel() {
+        return brandAndModel;
+    }
+
+    /**
+     * @param brandAndModel the brandAndModel to set
+     */
+    public void setBrandAndModel(String brandAndModel) {
+        this.brandAndModel = brandAndModel;
+    }
+
+    /**
+     * @return the price
+     */
+    public int getPrice() {
+        return price;
+    }
+
+    /**
+     * @param price the price to set
+     */
+    public void setPrice(int price) {
+        this.price = price;
+    }
+    
     private void printMenu() {
         System.out.println("(1) Enter the info about a new vehicle (either a car or a SUV)." + NEW_LINE
                 + "(2) Print out brand and model, delimited by spaces, for all vehicles." + NEW_LINE
@@ -120,10 +118,9 @@ public class Car {
                 + "(8) End program");
     }
 
-    private void promptUserAddVehicle() {
+    private void populateCar(Car newCar) {
         int year, price;
         String brandAndModel;
-        Car newCar;
 
         System.out.println("Enter vehicle brand and model:");
         brandAndModel = keyboardScanner.nextLine();
@@ -132,11 +129,13 @@ public class Car {
             System.out.println("Invalid input: You must enter a brand and model.");
             return;
         }
+        newCar.setBrandAndModel(brandAndModel);
 
         System.out.println("Enter year:");
         String yearString = keyboardScanner.nextLine();
         if (yearString.matches("^\\d+$")) {
             year = Integer.parseInt(yearString);
+            newCar.setYear(year);
         } else {
             System.out.println("Invalid input: You must enter a number.");
             return;
@@ -144,23 +143,77 @@ public class Car {
 
         System.out.println("Enter price, or leave blank:");
         String priceString = keyboardScanner.nextLine();
-        System.out.println("price: " + priceString);
         if (priceString.matches("^\\d+$")) {
             price = Integer.parseInt(priceString);
-            newCar = new Car(year, brandAndModel, price);
+            newCar.setPrice(price);
         } else if (priceString.matches("")) {
-            newCar = new Car(year, brandAndModel);
+            newCar.setPrice(50000);
         } else {
             System.out.println("Invalid input: You must enter a number.");
             return;
         }
+        
+    }
 
-        cars.add(newCar);
+    private void promptUserAddVehicle() {
+        int userChoice;
+
+        System.out.println("(1) Enter car" + NEW_LINE
+                + "(2) Enter SUV");
+
+        String userString = keyboardScanner.nextLine();
+
+        if (userString.matches("[12]")) {
+            userChoice = Integer.parseInt(userString);
+        } else {
+            System.out.println("You must enter a digit between 1 and 2.");
+            return;
+        }
+
+        if (userChoice == 1) {
+            Car car = new Car();
+            populateCar(car);
+            cars.add(car);
+        } else {
+            SUV suv = new SUV();
+            populateCar(suv);
+            
+            System.out.println("Enter number of seats:");
+            String numSeatsString = keyboardScanner.nextLine();
+            if (numSeatsString.matches("^\\d+$")) {
+                int numSeats = Integer.parseInt(numSeatsString);
+                suv.setNumSeats(numSeats);
+            } else {
+                System.out.println("Invalid input: You must enter a number.");
+                return;
+            }
+            
+            System.out.println("Enter 1 or 0 to indicate if the SUV is all terrain or not:");
+            String isAllTerrainString = keyboardScanner.nextLine();
+            if (isAllTerrainString.matches("[01]")) {
+                Boolean isAllTerrain = Boolean.parseBoolean(isAllTerrainString);
+                suv.setIsAllTerrain(isAllTerrain);
+            } else {
+                System.out.println("Invalid input: You must enter 0 or 1.");
+                return;
+            }
+            
+            System.out.println("Enter tire brand:");
+            String tireBrand = keyboardScanner.nextLine();
+            String[] tireBrandTokens = tireBrand.split("\\s+");
+            if (tireBrandTokens.length == 1) {
+                suv.setTireBrand(tireBrand);
+            } else {
+                System.out.println("Invalid input: You must enter a single word.");
+                return;
+            }
+            cars.add(suv);
+        }
     }
 
     private void printBrandAndModel() {
         for (Car car : cars) {
-            String tokens[] = car.getBrandAndModel().split(" +");
+            String[] tokens = car.getBrandAndModel().split(" +");
             System.out.println("Brand: " + tokens[0] + NEW_LINE
                     + "Model: " + tokens[1] + NEW_LINE);
         }
@@ -188,7 +241,7 @@ public class Car {
             System.out.println(car.getYear());
         }
     }
-    
+
     private void readAndParseInputFile() {
         System.out.println("Enter the name of the input file:");
         try {
@@ -196,7 +249,7 @@ public class Car {
             Scanner fileScanner = new Scanner(file);
             while (fileScanner.hasNextLine()) {
                 String[] carTokens = fileScanner.nextLine().split("\\s");
-                
+
                 if (Integer.parseInt(carTokens[4]) == 0) {
                     Car car = new Car();
                     car.setBrandAndModel(carTokens[0].concat(" " + carTokens[1]));
@@ -222,7 +275,7 @@ public class Car {
     public String dataDump() {
         return getBrandAndModel() + " " + getYear() + " " + getPrice();
     }
-    
+
     private void outputDataDumpToFile() {
         try {
             File outputFile = new File("./output.txt");
@@ -269,7 +322,7 @@ public class Car {
                     break;
                 case STD_DATA_DUMP:
                     for (Car car : cars) {
-                        System.out.println(car.dataDump()); 
+                        System.out.println(car.dataDump());
                     }
                     break;
                 case FILE_DATA_DUMP:

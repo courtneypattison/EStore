@@ -54,7 +54,7 @@ public class SUV extends Car {
     /**
      * @return the isAllTerrain
      */
-    public boolean isIsAllTerrain() {
+    public boolean getIsAllTerrain() {
         return isAllTerrain;
     }
 
@@ -81,6 +81,6 @@ public class SUV extends Car {
     
     @Override
     public String dataDump() {
-        return "SUV: " + getBrandAndModel().split("\\s")[1] + " " + getTireBrand(); 
+        return "SUV: " + getBrandAndModel().split("\\s")[1] + " " + getTireBrand() + " " + getNumSeats() + " " + getIsAllTerrain(); 
     }
 }
