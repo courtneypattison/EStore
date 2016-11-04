@@ -2,7 +2,7 @@ package estoresearch;
 
 /**
  * Gets and sets id, name, year, price, and maker of electronic
- * 
+ *
  * @author Courtney Bodi
  */
 public class Electronic extends Product {
@@ -73,12 +73,17 @@ public class Electronic extends Product {
     /**
      * Determines if Electronics are equal
      *
-     * @param other electronic object
      * @return whether or not the Electronics are equal
      */
-    public boolean equals(Electronic other) {
-        return super.equals(other)
-                && maker.equals(other.maker);
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        } else {
+            Electronic otherElectronic = (Electronic)otherObject;
+            return super.equals(otherElectronic)
+                    && maker.equals(otherElectronic.maker);
+        }
     }
 
     /**
@@ -99,10 +104,10 @@ public class Electronic extends Product {
     public static void main(String[] args) {
         Electronic elec1 = null, elec2 = null;
         boolean pass = true;
-        
+
         System.out.println("Electronic Class Testing" + System.lineSeparator()
                 + "Prints true when test is passed, false otherwise" + System.lineSeparator());
-        
+
         try {
             elec1 = new Electronic("000000", "foo", 1990, 200.00, "hello");
         } catch (IllegalArgumentException e) {
@@ -110,7 +115,7 @@ public class Electronic extends Product {
         } finally {
             System.out.println(pass + "\tnew Electronic(\"000000\", \"foo\", 1990, 200.00, \"hello\")");
         }
-        
+
         try {
             elec2 = new Electronic("000001", "foo", 1990);
         } catch (IllegalArgumentException e) {
@@ -118,7 +123,7 @@ public class Electronic extends Product {
         } finally {
             System.out.println(pass + "\tnew Electronic(\"000001\", \"foo\", 1990)");
         }
-        
+
         try {
             elec1.setMaker("");
         } catch (IllegalArgumentException e) {
@@ -126,9 +131,9 @@ public class Electronic extends Product {
         } finally {
             System.out.println(pass + "\telec1.setMaker(\"\")");
         }
-        
+
         pass = !elec1.equals(elec2);
         System.out.println(pass + "\t!elec1.equals(elec2)");
-        
+
     }
 }

@@ -2,6 +2,7 @@ package estoresearch;
 
 /**
  * Gets and sets id, name, year, and price of product
+ *
  * @author Courtney Bodi
  */
 public class Product {
@@ -10,7 +11,7 @@ public class Product {
     public static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
     public static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
     public static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
-    
+
     public static final int NO_PRICE = -1;
 
     public static final int MIN_YEAR = 1000;
@@ -225,14 +226,20 @@ public class Product {
     /**
      * Check if Products are equal
      *
-     * @param other product object
+     * @param otherObject
      * @return whether or not the Products are equal
      */
-    public boolean equals(Product other) {
-        return id.equals(other.id)
-                && name.equals(other.name)
-                && year == other.year
-                && price == other.price;
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        } else {
+            Product otherProduct = (Product)otherObject;
+            return id.equals(otherProduct.id)
+                    && name.equals(otherProduct.name)
+                    && year == otherProduct.year
+                    && price == otherProduct.price;
+        }
     }
 
     /**

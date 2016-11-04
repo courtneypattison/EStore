@@ -98,6 +98,23 @@ public class Book extends Product {
     }
     
     /**
+     * 
+     * @param otherObject
+     * @return if books are equal
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        } else {
+            Book bookObject = (Book)otherObject;
+            return super.equals(bookObject)
+                && author.equals(bookObject.author)
+                && publisher.equals(bookObject.publisher);
+        }
+    }
+    
+    /**
      * Main method for testing Book
      *
      * @param args the command line arguments

@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 /**
  * Adds and searches books and electronics
- * 
+ *
  * @author Courtney Bodi
  */
 public class EStoreSearch {
@@ -22,40 +22,36 @@ public class EStoreSearch {
      * Add menu selection options
      */
     public enum AddMenuOption {
-        QUIT, ADD_BOOK, ADD_ELECTRONIC
+        RETURN, ADD_BOOK, ADD_ELECTRONIC
     }
 
-    private static final int MAX_CHOICE = 2;
-    private static final int MIN_CHOICE = 0;
+    public static final int MAX_CHOICE = 2;
+    public static final int MIN_CHOICE = 0;
 
-    private static final int MAX_TRIES = 3;
-    private static final String MAX_TRIES_MSG = "Too many attempts!";
+    public static final int MAX_TRIES = 3;
+    public static final String MAX_TRIES_MSG = "Too many attempts!";
 
-    private static final String INVALID_CHOICE = "Invalid input: you must enter 0, 1, or 2.";
-    private static final String INVALID_TIME_PERIOD = "Invalid input: time period must be in the format of -1999, 1999-, or 1999-2000.";
+    public static final String INVALID_CHOICE = "Invalid input: you must enter 0, 1, or 2.";
+    public static final String INVALID_TIME_PERIOD = "Invalid input: time period must be in the format of -1999, 1999-, or 1999-2000.";
 
-    private ArrayList<Book> books = new ArrayList<>();
-    private ArrayList<Electronic> electronics = new ArrayList<>();
+    private ArrayList<Product> products = new ArrayList<>();
 
     private Scanner scanner = new Scanner(System.in);
 
     /**
      * EStoreSearch constructor with all fields
      *
-     * @param books in a list
-     * @param electronics in a list
+     * @param products including books and electronics
      */
-    public EStoreSearch(ArrayList<Book> books, ArrayList<Electronic> electronics) {
-        this.books = books;
-        this.electronics = electronics;
+    public EStoreSearch(ArrayList<Product> products) {
+        this.products = products;
     }
 
     /**
      * Generic EStoreSearch constructor
      */
     public EStoreSearch() {
-        books = null;
-        electronics = null;
+        products = null;
     }
 
     /**
@@ -109,14 +105,9 @@ public class EStoreSearch {
      * @return
      */
     private Product checkIfIdExists(Product product) {
-        for (Book book : books) {
-            if (product.getId().equals(book.getId())) {
-                return book;
-            }
-        }
-        for (Electronic electronic : electronics) {
-            if (product.getId().equals(electronic.getId())) {
-                return electronic;
+        for (Product existingProduct : products) {
+            if (product.getId().equals(existingProduct.getId())) {
+                return product;
             }
         }
         return null;
@@ -177,7 +168,7 @@ public class EStoreSearch {
             return;
         }
 
-        boolean add = books.add(book);
+        boolean add = products.add(book);
         assert (add);
     }
 
@@ -201,7 +192,7 @@ public class EStoreSearch {
             return;
         }
 
-        boolean add = electronics.add(electronic);
+        boolean add = products.add(electronic);
         assert (add);
     }
 
@@ -225,7 +216,7 @@ public class EStoreSearch {
             userChoice = AddMenuOption.values()[userInt];
 
             switch (userChoice) {
-                case QUIT:
+                case RETURN:
                     break;
                 case ADD_BOOK:
                     addBook();
@@ -237,7 +228,7 @@ public class EStoreSearch {
                     System.out.println(INVALID_CHOICE);
                     break;
             }
-        } while (userChoice != AddMenuOption.QUIT);
+        } while (userChoice != AddMenuOption.RETURN);
     }
 
     /**
@@ -264,7 +255,7 @@ public class EStoreSearch {
             throw new IllegalArgumentException(Product.INVALID_PRICE);
         }
 
-        if (price <= 0) {
+        if (price < 0) {
             throw new IllegalArgumentException(Product.INVALID_PRICE);
         }
 
@@ -345,8 +336,8 @@ public class EStoreSearch {
         String[] keywordTokens = keyword.split("\\s+");
 
         if (keywordTokens.length != 0) {
-            for (Book book : books) {
-                String[] nameTokens = book.getName().split("\\s+");
+            for (Product product : products) {
+                String[] nameTokens = product.getName().split("\\s+");
                 int matchCount = 0;
                 for (String nameToken : nameTokens) {
                     for (String keywordToken : keywordTokens) {
@@ -356,22 +347,7 @@ public class EStoreSearch {
                     }
                 }
                 if (matchCount == keywordTokens.length) {
-                    matchingProducts.add(book);
-                }
-            }
-
-            for (Electronic electronic : electronics) {
-                String[] nameTokens = electronic.getName().split("\\s+");
-                int matchCount = 0;
-                for (String nameToken : nameTokens) {
-                    for (String keywordToken : keywordTokens) {
-                        if (keywordToken.equalsIgnoreCase(nameToken)) {
-                            matchCount++;
-                        }
-                    }
-                }
-                if (matchCount == keywordTokens.length) {
-                    matchingProducts.add(electronic);
+                    matchingProducts.add(product);
                 }
             }
         }
@@ -401,44 +377,25 @@ public class EStoreSearch {
                             numTries++;
                             exceptionFlag = true;
                         } else {
-                            for (Book book : books) {
-                                if (book.getYear() <= parseUserInt(timePeriod.substring(1, 5), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(book);
-                                }
-                            }
-
-                            for (Electronic electronic : electronics) {
-                                if (electronic.getYear() <= parseUserInt(timePeriod.substring(1, 5), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(electronic);
+                            for (Product product : products) {
+                                if (product.getYear() <= parseUserInt(timePeriod.substring(1, 5), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(product);
                                 }
                             }
                         }
                         break;
                     case 4:
                         if (timePeriod.length() == 5) {
-                            for (Book book : books) {
-                                if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(book);
-                                }
-                            }
-
-                            for (Electronic electronic : electronics) {
-                                if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(electronic);
+                            for (Product product : products) {
+                                if (product.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(product);
                                 }
                             }
                         } else if (timePeriod.length() == 9) {
-                            for (Book book : books) {
-                                if (book.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)
-                                        && book.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(book);
-                                }
-                            }
-
-                            for (Electronic electronic : electronics) {
-                                if (electronic.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)
-                                        && electronic.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(electronic);
+                            for (Product product : products) {
+                                if (product.getYear() >= parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)
+                                        && product.getYear() <= parseUserInt(timePeriod.substring(5, 9), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(product);
                                 }
                             }
                         } else {
@@ -449,15 +406,9 @@ public class EStoreSearch {
                         break;
                     case -1:
                         if (timePeriod.length() == 4) {
-                            for (Book book : books) {
-                                if (book.getYear() == parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(book);
-                                }
-                            }
-
-                            for (Electronic electronic : electronics) {
-                                if (electronic.getYear() == parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
-                                    matchingProducts.add(electronic);
+                            for (Product product : products) {
+                                if (product.getYear() == parseUserInt(timePeriod.substring(0, 4), Product.MIN_YEAR, Product.MAX_YEAR)) {
+                                    matchingProducts.add(product);
                                 }
                             }
                         } else {
@@ -518,7 +469,7 @@ public class EStoreSearch {
         promptUserAddMatchingKeyword(matchingKeywordProducts);
 
         try {
-        promptUserAddMatchingTimePeriod(matchingTimePeriodProducts);
+            promptUserAddMatchingTimePeriod(matchingTimePeriodProducts);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             return;
@@ -569,9 +520,10 @@ public class EStoreSearch {
      */
     public void executeMainMenuLoop() {
         MainMenuOption userChoice = MainMenuOption.ADD;
+        System.out.println("Welcome to EStore Search");
 
         do {
-            int userInt = 1;
+            int userInt;
 
             printMainMenu();
 
@@ -604,12 +556,8 @@ public class EStoreSearch {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        ArrayList<Book> books = new ArrayList<>();
-        ArrayList<Electronic> electronics = new ArrayList<>();
-
-        EStoreSearch eStoreSearch = new EStoreSearch(books, electronics);
-
-        System.out.println("Welcome to EStore Search" + System.lineSeparator());
+        EStoreSearch eStoreSearch = new EStoreSearch(new ArrayList<>());
+        
         eStoreSearch.executeMainMenuLoop();
     }
 
