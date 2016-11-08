@@ -27,11 +27,3 @@ price = ""
 year = "2013"
 maker = "Apple Inc."
 
-type = "book"
-productID = "555555"
-name = "5"
-price = ""
-year = "1999"
-authors = ""
-publisher = ""
-

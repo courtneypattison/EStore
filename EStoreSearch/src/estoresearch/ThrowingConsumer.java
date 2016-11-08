@@ -15,12 +15,12 @@ import java.util.function.Consumer;
 @FunctionalInterface
 public interface ThrowingConsumer<T> extends Consumer<T> {
     @Override
-    default void accept(final T elem) {
+    default void accept(final T t) {
        try {
-            acceptThrows(elem);
+            acceptThrows(t);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
-    void acceptThrows(final T elem) throws Exception;
+    void acceptThrows(final T t) throws Exception;
 }

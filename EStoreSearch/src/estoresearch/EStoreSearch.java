@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -38,6 +39,7 @@ public class EStoreSearch {
     public static final String INVALID_TIME_PERIOD = "Invalid input: time period must be in the format of -1999, 1999-, or 1999-2000.";
 
     private ArrayList<Product> products = new ArrayList<>();
+    private HashMap<String, ArrayList<Integer>> keywords = new HashMap<>();
 
     private Scanner scanner = new Scanner(System.in);
 
@@ -149,6 +151,21 @@ public class EStoreSearch {
         }
 
     }
+    
+    private void addKeywordsToHashMap(Product product) {
+        String[] nameTokens = product.getName().toLowerCase().split("\\s+");
+        for (String keyword : nameTokens) {
+            if (keywords.containsKey(keyword)) {
+                ArrayList<Integer> ints = keywords.get(keyword);
+                ints.add(products.indexOf(product));
+                keywords.put(keyword, ints);
+            } else {
+                ArrayList<Integer> ints = new ArrayList<>();
+                ints.add(products.indexOf(product));
+                keywords.put(keyword, ints);
+            }
+        }
+    }
 
     /**
      * Adds book to books list
@@ -174,6 +191,8 @@ public class EStoreSearch {
 
         boolean add = products.add(book);
         assert (add);
+        addKeywordsToHashMap(book);
+        
     }
 
     /**
@@ -199,6 +218,7 @@ public class EStoreSearch {
 
         boolean add = products.add(electronic);
         assert (add);
+        addKeywordsToHashMap(electronic);
     }
 
     /**
@@ -340,7 +360,7 @@ public class EStoreSearch {
         String keyword = scanner.nextLine();
         String[] keywordTokens = keyword.split("\\s+");
 
-        if (keywordTokens.length != 0) {
+        if (keywordTokens.length > 0) {
             for (Product product : products) {
                 String[] nameTokens = product.getName().split("\\s+");
                 int matchCount = 0;
@@ -641,9 +661,13 @@ public class EStoreSearch {
 
                 if (attribute.equals("\n") || !fileInput.hasNextLine()) {
                     if (type.equals("book")) {
-                        products.add(new Book(productID, name, year, price, authors, publisher));
+                        Book book = new Book(productID, name, year, price, authors, publisher);
+                        products.add(book);
+                        addKeywordsToHashMap(book);
                     } else {
-                        products.add(new Electronic(productID, name, year, price, maker));
+                        Electronic electronic = new Electronic(productID, name, year, price, maker);
+                        products.add(electronic);
+                        addKeywordsToHashMap(electronic);
                     }
 
                 }
