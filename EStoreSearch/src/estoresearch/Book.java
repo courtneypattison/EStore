@@ -20,20 +20,21 @@ public class Book extends Product {
      * @param price of product in dollars CAD
      * @param author of product with first and last name
      * @param publisher of product name
+     * @throws estoresearch.InvalidInputException
      */
-    public Book(String id, String name, int year, double price, String author, String publisher) {
+    public Book(String id, String name, int year, double price, String author, String publisher) throws InvalidInputException {
         super(id, name, year, price);
 
         if (author != null) {
             this.author = author;
         } else {
-            throw new IllegalArgumentException(INVALID_AUTHOR);
+            throw new InvalidInputException(INVALID_AUTHOR);
         }
 
         if (publisher != null) {
             this.publisher = publisher;
         } else {
-            throw new IllegalArgumentException(INVALID_PUBLISHER);
+            throw new InvalidInputException(INVALID_PUBLISHER);
         }
     }
 
@@ -43,12 +44,13 @@ public class Book extends Product {
      * @param id is a unique 6 digit string
      * @param name of product
      * @param year product released
+     * @throws estoresearch.InvalidInputException
      */
-    public Book(String id, String name, int year) {
+    public Book(String id, String name, int year) throws InvalidInputException {
         super(id, name, year);
     }
     
-    public Book() {
+    public Book() throws InvalidInputException {
         super();
         author = publisher = "";
     }
@@ -67,11 +69,11 @@ public class Book extends Product {
      *
      * @param author the author to set
      */
-    public void setAuthor(String author) {
+    public void setAuthor(String author) throws InvalidInputException {
         if (author != null) {
             this.author = author;
         } else {
-            throw new IllegalArgumentException(INVALID_AUTHOR);
+            throw new InvalidInputException(INVALID_AUTHOR);
         }
     }
 
@@ -89,11 +91,11 @@ public class Book extends Product {
      *
      * @param publisher the publisher to set
      */
-    public void setPublisher(String publisher) {
+    public void setPublisher(String publisher) throws InvalidInputException {
         if (publisher != null) {
             this.publisher = publisher;
         } else {
-            throw new IllegalArgumentException(INVALID_PUBLISHER);
+            throw new InvalidInputException(INVALID_PUBLISHER);
         }
     }
     
@@ -115,6 +117,18 @@ public class Book extends Product {
     }
     
     /**
+     * 
+     * @return electronic string
+     */
+    @Override
+    public String toString() {
+        return "type = \"book\"" + System.lineSeparator()
+                + super.toString()
+                + "authors = \"" + author + "\"" + System.lineSeparator()
+                + "publisher = \"" + publisher + "\"" + System.lineSeparator();
+    }
+    
+    /**
      * Main method for testing Book
      *
      * @param args the command line arguments
@@ -126,11 +140,15 @@ public class Book extends Product {
         System.out.println("Book Class Testing" + System.lineSeparator()
                 + "Prints true when test is passed, false otherwise" + System.lineSeparator());
         
+        try {
         Book book0 = new Book();
+        } catch (InvalidInputException e) {
+            System.out.println("Invalid book");
+        }
         
         try {
             book1 = new Book("000000", "foo", 1990, 200.00, "hello", "yo");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = false;
         } finally {
             System.out.println(pass + "\tnew Book(\"000000\", \"foo\", 1990, 200.00, \"hello\")");
@@ -138,7 +156,7 @@ public class Book extends Product {
         
         try {
             book2 = new Book("000001", "foo", 1990);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = false;
         } finally {
             System.out.println(pass + "\tnew Book(\"000001\", \"foo\", 1990)");
@@ -146,7 +164,7 @@ public class Book extends Product {
         
         try {
             book1.setAuthor("");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = true;
         } finally {
             System.out.println(pass + "\tbook1.setMaker(\"\")");
@@ -154,7 +172,7 @@ public class Book extends Product {
         
         try {
             book1.setPublisher("Springer");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = false;
         } finally {
             System.out.println(pass + "\tbook1.setPublisher(\"Springer\")");
@@ -162,6 +180,8 @@ public class Book extends Product {
         
         pass = !book1.equals(book2);
         System.out.println(pass + "\t!elec1.equals(elec2)");
+        
+        System.out.println(book1.toString());
         
     }
 }

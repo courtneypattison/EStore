@@ -30,30 +30,31 @@ public class Product {
      * @param name of product
      * @param year product released
      * @param price of product in dollars CAD
+     * @throws estoresearch.InvalidInputException
      */
-    public Product(String id, String name, int year, double price) {
+    public Product(String id, String name, int year, double price) throws InvalidInputException {
         if (validateId(id)) {
             this.id = id;
         } else {
-            throw new IllegalArgumentException(INVALID_ID);
+            throw new InvalidInputException(INVALID_ID);
         }
 
         if (validateString(name)) {
             this.name = name;
         } else {
-            throw new IllegalArgumentException(INVALID_NAME);
+            throw new InvalidInputException(INVALID_NAME);
         }
 
         if (validateYear(year)) {
             this.year = year;
         } else {
-            throw new IllegalArgumentException(INVALID_YEAR);
+            throw new InvalidInputException(INVALID_YEAR);
         }
 
         if (validatePrice(price)) {
             this.price = price;
         } else {
-            throw new IllegalArgumentException(INVALID_PRICE);
+            throw new InvalidInputException(INVALID_PRICE);
         }
     }
 
@@ -64,34 +65,15 @@ public class Product {
      * @param name of product
      * @param year product released
      */
-    public Product(String id, String name, int year) {
-        if (validateId(id)) {
-            this.id = id;
-        } else {
-            throw new IllegalArgumentException(INVALID_ID);
-        }
-
-        if (validateString(name)) {
-            this.name = name;
-        } else {
-            throw new IllegalArgumentException(INVALID_NAME);
-        }
-
-        if (validateYear(year)) {
-            this.year = year;
-        } else {
-            throw new IllegalArgumentException(INVALID_YEAR);
-        }
+    public Product(String id, String name, int year) throws InvalidInputException {
+        this(id, name, year, 0.0);
     }
 
     /**
      * Default Product constructor
      */
-    public Product() {
-        id = "000000";
-        name = " ";
-        year = MIN_YEAR;
-        price = 0.0;
+    public Product() throws InvalidInputException {
+        this("000000", " ", MIN_YEAR, 0.0);
     }
 
     /**
@@ -118,11 +100,11 @@ public class Product {
      *
      * @param id the id to set
      */
-    public void setId(String id) {
+    public void setId(String id) throws InvalidInputException {
         if (validateId(id)) {
             this.id = id;
         } else {
-            throw new IllegalArgumentException(INVALID_ID);
+            throw new InvalidInputException (INVALID_ID);
         }
     }
 
@@ -150,11 +132,11 @@ public class Product {
      *
      * @param name the name to set
      */
-    public void setName(String name) {
+    public void setName(String name) throws InvalidInputException {
         if (validateString(name)) {
             this.name = name;
         } else {
-            throw new IllegalArgumentException(INVALID_NAME);
+            throw new InvalidInputException(INVALID_NAME);
         }
     }
 
@@ -182,11 +164,11 @@ public class Product {
      *
      * @param year the year to set
      */
-    public void setYear(int year) {
+    public void setYear(int year) throws InvalidInputException {
         if (validateYear(year)) {
             this.year = year;
         } else {
-            throw new IllegalArgumentException(INVALID_YEAR);
+            throw new InvalidInputException(INVALID_YEAR);
         }
     }
 
@@ -215,11 +197,11 @@ public class Product {
      *
      * @param price the price to set
      */
-    public void setPrice(double price) {
+    public void setPrice(double price) throws InvalidInputException {
         if (validatePrice(price)) {
             this.price = price;
         } else {
-            throw new IllegalArgumentException(INVALID_PRICE);
+            throw new InvalidInputException(INVALID_PRICE);
         }
     }
 
@@ -250,15 +232,15 @@ public class Product {
     @Override
     public String toString() {
         if (price == NO_PRICE) {
-            return id + System.lineSeparator()
-                    + name + System.lineSeparator()
-                    + year + System.lineSeparator()
-                    + "" + System.lineSeparator();
+            return "productID = \"" + id + "\"" + System.lineSeparator()
+                    + "name = \"" + name + "\"" + System.lineSeparator()
+                    + "price = \"\"" + System.lineSeparator()
+                    + "year = \"" + year + "\"" + System.lineSeparator();
         } else {
-            return id + System.lineSeparator()
-                    + name + System.lineSeparator()
-                    + year + System.lineSeparator()
-                    + price + System.lineSeparator();
+            return "productID = \"" + id + "\"" + System.lineSeparator()
+                    + "name = \"" + name + "\"" + System.lineSeparator()
+                    + "price = \"" + price + "\"" + System.lineSeparator()
+                    + "year = \"" + year + "\"" + System.lineSeparator();
         }
     }
 
@@ -277,7 +259,7 @@ public class Product {
 
         try {
             product1 = new Product();
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = false;
         } finally {
             System.out.println(pass + "\tnew Product()");
@@ -285,7 +267,7 @@ public class Product {
 
         try {
             product2 = new Product("000025", "Absolute Java", 2015);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = false;
         } finally {
             System.out.println(pass + "\tnew Product(\"000025\", \"Absolute Java\", 2015)");
@@ -293,7 +275,7 @@ public class Product {
 
         try {
             product3 = new Product("000026", "Absolute Java", 2015, 199.95);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             product3 = null;
             pass = false;
         } finally {
@@ -302,7 +284,7 @@ public class Product {
 
         try {
             product4 = new Product("5", "Absolute Java", 2015, 199.95);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = true;
         } finally {
             System.out.println(pass + "\tnew Product(\"5\", \"Absolute Java\", 2015, 199.95)");
@@ -326,7 +308,7 @@ public class Product {
 
         try {
             product3.setId("3");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = true;
         } finally {
             System.out.println(pass + "\tproduct3.setId(\"3\")");
@@ -334,7 +316,7 @@ public class Product {
 
         try {
             product3.setName("");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = true;
         } finally {
             System.out.println(pass + "\tproduct3.setName(\"\")");
@@ -342,7 +324,7 @@ public class Product {
 
         try {
             product3.setYear(3);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = true;
         } finally {
             System.out.println(pass + "\tproduct3.setYear(3)");
@@ -350,7 +332,7 @@ public class Product {
 
         try {
             product3.setPrice(NO_PRICE);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = true;
         } finally {
             System.out.println(pass + "\tproduct3.setPrice(NO_PRICE);");
@@ -358,5 +340,7 @@ public class Product {
 
         pass = !product1.equals(product2);
         System.out.println(pass + "\t!product3.equals(product1)");
+        
+        System.out.println(product1.toString());
     }
 }

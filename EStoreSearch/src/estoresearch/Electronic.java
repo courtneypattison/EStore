@@ -19,13 +19,14 @@ public class Electronic extends Product {
      * @param year product released
      * @param price of product in dollars CAD
      * @param maker of product string
+     * @throws estoresearch.InvalidInputException
      */
-    public Electronic(String id, String name, int year, double price, String maker) {
+    public Electronic(String id, String name, int year, double price, String maker) throws InvalidInputException {
         super(id, name, year, price);
         if (maker != null) {
             this.maker = maker;
         } else {
-            throw new IllegalArgumentException(INVALID_MAKER);
+            throw new InvalidInputException(INVALID_MAKER);
         }
     }
 
@@ -35,15 +36,17 @@ public class Electronic extends Product {
      * @param id is a unique 6 digit string
      * @param name of product
      * @param year product released
+     * @throws estoresearch.InvalidInputException
      */
-    public Electronic(String id, String name, int year) {
+    public Electronic(String id, String name, int year) throws InvalidInputException {
         super(id, name, year);
     }
 
     /**
      * Default Electronic constructor
+     * @throws estoresearch.InvalidInputException
      */
-    public Electronic() {
+    public Electronic() throws InvalidInputException {
         super();
         maker = "";
     }
@@ -61,12 +64,13 @@ public class Electronic extends Product {
      * Sets maker
      *
      * @param maker the maker to set
+     * @throws estoresearch.InvalidInputException
      */
-    public void setMaker(String maker) {
+    public void setMaker(String maker) throws InvalidInputException {
         if (maker != null) {
             this.maker = maker;
         } else {
-            throw new IllegalArgumentException(INVALID_MAKER);
+            throw new InvalidInputException(INVALID_MAKER);
         }
     }
 
@@ -93,7 +97,9 @@ public class Electronic extends Product {
      */
     @Override
     public String toString() {
-        return super.toString() + maker;
+        return "type = \"electronics\"" + System.lineSeparator()
+                + super.toString()
+                + "maker = \"" + maker + "\"" + System.lineSeparator();
     }
 
     /**
@@ -110,7 +116,7 @@ public class Electronic extends Product {
 
         try {
             elec1 = new Electronic("000000", "foo", 1990, 200.00, "hello");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = false;
         } finally {
             System.out.println(pass + "\tnew Electronic(\"000000\", \"foo\", 1990, 200.00, \"hello\")");
@@ -118,7 +124,7 @@ public class Electronic extends Product {
 
         try {
             elec2 = new Electronic("000001", "foo", 1990);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = false;
         } finally {
             System.out.println(pass + "\tnew Electronic(\"000001\", \"foo\", 1990)");
@@ -126,7 +132,7 @@ public class Electronic extends Product {
 
         try {
             elec1.setMaker("");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             pass = true;
         } finally {
             System.out.println(pass + "\telec1.setMaker(\"\")");
@@ -134,6 +140,8 @@ public class Electronic extends Product {
 
         pass = !elec1.equals(elec2);
         System.out.println(pass + "\t!elec1.equals(elec2)");
+        
+        System.out.println(elec1.toString());
 
     }
 }

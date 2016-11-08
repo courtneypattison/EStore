@@ -1,8 +1,11 @@
 package estoresearch;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 /**
  * Adds and searches books and electronics
@@ -78,7 +81,7 @@ public class EStoreSearch {
      * @param prompt
      * @param setMethod
      */
-    private void promptUserSetField(String prompt, Consumer<String> setMethod) {
+    private void promptUserSetField(String prompt, ThrowingConsumer<String> setMethod) throws InvalidInputException {
         int numTries = 0;
         boolean exceptionFlag;
 
@@ -86,13 +89,13 @@ public class EStoreSearch {
             exceptionFlag = false;
             System.out.println(prompt);
             try {
-                setMethod.accept(scanner.nextLine());
-            } catch (IllegalArgumentException e) {
+                setMethod.acceptThrows(scanner.nextLine());
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
                 numTries++;
                 exceptionFlag = true;
                 if (numTries == MAX_TRIES) {
-                    throw new IllegalArgumentException(MAX_TRIES_MSG);
+                    throw new InvalidInputException(MAX_TRIES_MSG);
                 }
             }
         } while (exceptionFlag);
@@ -119,7 +122,7 @@ public class EStoreSearch {
      * @param product
      * @param productName
      */
-    private void populateProduct(Product product, String productName) {
+    private void populateProduct(Product product, String productName) throws InvalidInputException {
         try {
             int numTries = 0;
             Product productDuplicateId;
@@ -132,7 +135,7 @@ public class EStoreSearch {
                     System.out.println("ID already exists!");
                     numTries++;
                     if (numTries == MAX_TRIES) {
-                        throw new IllegalArgumentException(MAX_TRIES_MSG);
+                        throw new InvalidInputException(MAX_TRIES_MSG);
                     }
                 }
             } while (productDuplicateId != null);
@@ -141,8 +144,8 @@ public class EStoreSearch {
             promptUserSetField("Enter " + productName + " year:",
                     (String userString) -> product.setYear(parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR)));
             promptUserSetField("Enter " + productName + " price:", (String userString) -> product.setPrice(parsePrice(userString)));
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+        } catch (InvalidInputException e) {
+            throw new InvalidInputException(e.getMessage());
         }
 
     }
@@ -151,11 +154,12 @@ public class EStoreSearch {
      * Adds book to books list
      */
     private void addBook() {
-        Book book = new Book();
+        Book book;
 
         try {
+            book = new Book();
             populateProduct(book, "book");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
@@ -163,7 +167,7 @@ public class EStoreSearch {
         try {
             promptUserSetField("Enter book author:", (String userString) -> book.setAuthor(userString));
             promptUserSetField("Enter book publisher:", (String userString) -> book.setPublisher(userString));
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
@@ -176,18 +180,19 @@ public class EStoreSearch {
      * Adds electronic to electronics list
      */
     private void addElectronic() {
-        Electronic electronic = new Electronic();
+        Electronic electronic;
 
         try {
+            electronic = new Electronic();
             populateProduct(electronic, "electronic");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
 
         try {
             promptUserSetField("Enter electronic maker:", (String userString) -> electronic.setMaker(userString));
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
@@ -209,7 +214,7 @@ public class EStoreSearch {
 
             try {
                 userInt = parseUserInt(scanner.nextLine(), MIN_CHOICE, MAX_CHOICE);
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidInputException e) {
                 System.out.println(e.getMessage());
                 continue;
             }
@@ -237,12 +242,12 @@ public class EStoreSearch {
      * @param userString
      * @return valid price
      */
-    private double parsePrice(String userString) {
+    private double parsePrice(String userString) throws InvalidInputException {
         double price;
 
         String[] userTokens = userString.split("\\s+");
         if (userTokens.length != 1) {
-            throw new IllegalArgumentException(Product.INVALID_PRICE);
+            throw new InvalidInputException(Product.INVALID_PRICE);
         }
 
         if (userString.equals("")) {
@@ -252,11 +257,11 @@ public class EStoreSearch {
         try {
             price = Double.parseDouble(userString);
         } catch (Exception e) {
-            throw new IllegalArgumentException(Product.INVALID_PRICE);
+            throw new InvalidInputException(Product.INVALID_PRICE);
         }
 
         if (price < 0) {
-            throw new IllegalArgumentException(Product.INVALID_PRICE);
+            throw new InvalidInputException(Product.INVALID_PRICE);
         }
 
         return price;
@@ -267,22 +272,22 @@ public class EStoreSearch {
      *
      * @return user entered integer between min and max, or throws an exception
      */
-    private int parseUserInt(String userString, int min, int max) {
+    private int parseUserInt(String userString, int min, int max) throws InvalidInputException {
         int userInt = 0;
 
         String[] userTokens = userString.split("\\s+");
         if (userTokens.length != 1) {
-            throw new IllegalArgumentException("Invalid input: only enter one number.");
+            throw new InvalidInputException("Invalid input: only enter one number.");
         }
 
         try {
             userInt = Integer.parseInt(userString);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid input");
+            throw new InvalidInputException("Invalid input");
         }
 
         if (userInt < min || userInt > max) {
-            throw new IllegalArgumentException("Invalid input: enter a number between " + min + " and " + max);
+            throw new InvalidInputException("Invalid input: enter a number between " + min + " and " + max);
         }
 
         return userInt;
@@ -293,7 +298,7 @@ public class EStoreSearch {
      *
      * @param matchingProducts
      */
-    private void promptUserAddMatchingId(ArrayList<Product> matchingProducts) {
+    private void promptUserAddMatchingId(ArrayList<Product> matchingProducts) throws InvalidInputException {
         int numTries = 0;
         boolean exceptionFlag;
 
@@ -306,12 +311,12 @@ public class EStoreSearch {
             if (!id.equals("")) {
                 try {
                     product.setId(id);
-                } catch (IllegalArgumentException e) {
+                } catch (InvalidInputException e) {
                     System.out.println(e.getMessage());
                     numTries++;
                     exceptionFlag = true;
                     if (numTries == MAX_TRIES) {
-                        throw new IllegalArgumentException(MAX_TRIES_MSG);
+                        throw new InvalidInputException(MAX_TRIES_MSG);
                     }
                     continue;
                 }
@@ -359,7 +364,7 @@ public class EStoreSearch {
      *
      * @param matchingProducts
      */
-    private void promptUserAddMatchingTimePeriod(ArrayList<Product> matchingProducts) {
+    private void promptUserAddMatchingTimePeriod(ArrayList<Product> matchingProducts) throws InvalidInputException {
         int numTries = 0;
         boolean exceptionFlag;
 
@@ -426,7 +431,7 @@ public class EStoreSearch {
 
             }
             if (numTries == MAX_TRIES) {
-                throw new IllegalArgumentException(MAX_TRIES_MSG);
+                throw new InvalidInputException(MAX_TRIES_MSG);
             }
         } while (exceptionFlag);
     }
@@ -462,7 +467,7 @@ public class EStoreSearch {
 
         try {
             promptUserAddMatchingId(matchingIdProducts);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
@@ -470,7 +475,7 @@ public class EStoreSearch {
 
         try {
             promptUserAddMatchingTimePeriod(matchingTimePeriodProducts);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
@@ -515,6 +520,28 @@ public class EStoreSearch {
         printMatchingProducts(matchingProducts);
     }
 
+    private void printProducts() {
+        for (Product product : products) {
+            System.out.println(product.toString());
+        }
+    }
+
+    private void saveProducts() {
+        PrintWriter outputStream = null;
+        try {
+            outputStream = new PrintWriter(new FileOutputStream("output.txt"));
+        } catch (FileNotFoundException e) {
+            System.out.println("Error opening output.txt");
+            System.exit(0);
+        }
+
+        for (Product product : products) {
+            outputStream.println(product.toString());
+        }
+
+        outputStream.close();
+    }
+
     /**
      * Executes main command loop
      */
@@ -529,7 +556,7 @@ public class EStoreSearch {
 
             try {
                 userInt = parseUserInt(scanner.nextLine(), MIN_CHOICE, MAX_CHOICE);
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidInputException e) {
                 System.out.println(e.getMessage());
                 continue;
             }
@@ -537,6 +564,7 @@ public class EStoreSearch {
             userChoice = MainMenuOption.values()[userInt];
             switch (userChoice) {
                 case QUIT:
+                    saveProducts();
                     System.out.println("Thank you for using EStoreSearch!");
                     break;
                 case ADD:
@@ -552,13 +580,91 @@ public class EStoreSearch {
         } while (userChoice != MainMenuOption.QUIT);
     }
 
+    private String getAttribute(String line) {
+        String[] lineTokens = line.split(" ?=");
+        if (lineTokens.length > 1) {
+            return lineTokens[0];
+        } else {
+            return "\n";
+        }
+    }
+
+    private String getValue(String line) {
+        String[] lineTokens = line.split("(?<!\\\\)\"");
+        if (lineTokens.length == 2) {
+            return lineTokens[1];
+        } else {
+            return "";
+        }
+    }
+
+    private void loadProducts(String filename) {
+        Scanner fileInput = null;
+        String type = "", productID = "", name = "", authors = "", publisher = "", maker = "";
+        double price = Product.NO_PRICE;
+        int year = 0;
+
+        try {
+            fileInput = new Scanner(new FileInputStream(filename));
+        } catch (FileNotFoundException e) {
+            System.out.println(filename + " was not found or could not be opened.");
+            System.exit(0);
+        }
+
+        while (fileInput.hasNextLine()) {
+            String line = fileInput.nextLine();
+            String attribute = getAttribute(line);
+            String value = getValue(line);
+
+            try {
+                if (attribute.equals("type")) {
+                    type = value;
+                } else if (attribute.equals("productID")) {
+                    productID = value;
+                } else if (attribute.equals("name")) {
+                    name = value;
+                } else if (attribute.equals("price")) {
+                    price = parsePrice(value);
+                } else if (attribute.equals("year")) {
+                    year = parseUserInt(value, Product.MIN_YEAR, Product.MAX_YEAR);
+                } else if (attribute.equals("authors")) {
+                    authors = value;
+                } else if (attribute.equals("publisher")) {
+                    publisher = value;
+                } else if (attribute.equals("maker")) {
+                    maker = value;
+                } else if (attribute.equals("\n")) {
+                } else {
+                    System.out.println("Invalid input from file");
+                    System.exit(0);
+                }
+
+                if (attribute.equals("\n") || !fileInput.hasNextLine()) {
+                    if (type.equals("book")) {
+                        products.add(new Book(productID, name, year, price, authors, publisher));
+                    } else {
+                        products.add(new Electronic(productID, name, year, price, maker));
+                    }
+
+                }
+            } catch (InvalidInputException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        fileInput.close();
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        EStoreSearch eStoreSearch = new EStoreSearch(new ArrayList<>());
-        
-        eStoreSearch.executeMainMenuLoop();
-    }
+        if (args.length == 1) {
+            EStoreSearch eStoreSearch = new EStoreSearch(new ArrayList<>());
+            eStoreSearch.loadProducts(args[0]);
 
+            eStoreSearch.executeMainMenuLoop();
+        } else {
+            System.out.println("You must enter a filename when running this program.");
+        }
+    }
 }
