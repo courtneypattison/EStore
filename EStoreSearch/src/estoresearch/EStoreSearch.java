@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 
 /**
@@ -39,7 +40,7 @@ public class EStoreSearch {
     public static final String INVALID_TIME_PERIOD = "Invalid input: time period must be in the format of -1999, 1999-, or 1999-2000.";
 
     private ArrayList<Product> products = new ArrayList<>();
-    private HashMap<String, ArrayList<Integer>> keywords = new HashMap<>();
+    private HashMap<String, HashSet<Integer>> keywords = new HashMap<>();
 
     private Scanner scanner = new Scanner(System.in);
 
@@ -112,7 +113,7 @@ public class EStoreSearch {
     private Product checkIfIdExists(Product product) {
         for (Product existingProduct : products) {
             if (product.getId().equals(existingProduct.getId())) {
-                return product;
+                return existingProduct;
             }
         }
         return null;
@@ -151,16 +152,21 @@ public class EStoreSearch {
         }
 
     }
-    
+
+    /**
+     * Adds keywords from names in products to hash map
+     *
+     * @param product to add keywords from
+     */
     private void addKeywordsToHashMap(Product product) {
         String[] nameTokens = product.getName().toLowerCase().split("\\s+");
         for (String keyword : nameTokens) {
             if (keywords.containsKey(keyword)) {
-                ArrayList<Integer> ints = keywords.get(keyword);
+                HashSet<Integer> ints = keywords.get(keyword);
                 ints.add(products.indexOf(product));
                 keywords.put(keyword, ints);
             } else {
-                ArrayList<Integer> ints = new ArrayList<>();
+                HashSet<Integer> ints = new HashSet<>();
                 ints.add(products.indexOf(product));
                 keywords.put(keyword, ints);
             }
@@ -192,7 +198,7 @@ public class EStoreSearch {
         boolean add = products.add(book);
         assert (add);
         addKeywordsToHashMap(book);
-        
+
     }
 
     /**
@@ -318,7 +324,7 @@ public class EStoreSearch {
      *
      * @param matchingProducts
      */
-    private void promptUserAddMatchingId(ArrayList<Product> matchingProducts) throws InvalidInputException {
+    private HashSet<Product> promptUserAddMatchingId(HashSet<Product> matchingProducts) throws InvalidInputException {
         int numTries = 0;
         boolean exceptionFlag;
 
@@ -326,9 +332,13 @@ public class EStoreSearch {
 
         do {
             exceptionFlag = false;
+
             System.out.println("Enter product ID to be matched, or leave blank:");
             String id = scanner.nextLine();
-            if (!id.equals("")) {
+
+            if (id.equals("")) {
+                return null;
+            } else {
                 try {
                     product.setId(id);
                 } catch (InvalidInputException e) {
@@ -347,6 +357,7 @@ public class EStoreSearch {
             }
 
         } while (exceptionFlag);
+        return matchingProducts;
     }
 
     /**
@@ -355,27 +366,35 @@ public class EStoreSearch {
      *
      * @param matchingProducts
      */
-    private void promptUserAddMatchingKeyword(ArrayList<Product> matchingProducts) {
+    private HashSet<Product> promptUserAddMatchingKeyword(HashSet<Product> matchingProducts) {
         System.out.println("Enter keyword to be searched in name, or leave blank:");
-        String keyword = scanner.nextLine();
-        String[] keywordTokens = keyword.split("\\s+");
+        String search = scanner.nextLine();
+        String[] searchTokens = search.split("\\s+");
+        ArrayList<HashSet<Integer>> matches = new ArrayList<>();
+        HashSet<Integer> ints = new HashSet<>();
 
-        if (keywordTokens.length > 0) {
-            for (Product product : products) {
-                String[] nameTokens = product.getName().split("\\s+");
-                int matchCount = 0;
-                for (String nameToken : nameTokens) {
-                    for (String keywordToken : keywordTokens) {
-                        if (keywordToken.equalsIgnoreCase(nameToken)) {
-                            matchCount++;
-                        }
-                    }
-                }
-                if (matchCount == keywordTokens.length) {
-                    matchingProducts.add(product);
+        if (search.equals("")) {
+            return null;
+        } else {
+            for (String searchToken : searchTokens) {
+                if (keywords.containsKey(searchToken)) {
+                    matches.add(keywords.get(searchToken));
                 }
             }
+
+            if (!matches.isEmpty()) {
+                ints = matches.get(0);
+            }
+
+            for (HashSet<Integer> match : matches) {
+                ints.retainAll(match);
+            }
+
+            for (int i : ints) {
+                matchingProducts.add(products.get(i));
+            }
         }
+        return matchingProducts;
     }
 
     /**
@@ -384,7 +403,7 @@ public class EStoreSearch {
      *
      * @param matchingProducts
      */
-    private void promptUserAddMatchingTimePeriod(ArrayList<Product> matchingProducts) throws InvalidInputException {
+    private HashSet<Product> promptUserAddMatchingTimePeriod(HashSet<Product> matchingProducts) throws InvalidInputException {
         int numTries = 0;
         boolean exceptionFlag;
 
@@ -394,7 +413,9 @@ public class EStoreSearch {
             System.out.println("Enter time period, e.g., 1999-2001, or leave blank:");
             String timePeriod = scanner.nextLine();
 
-            if (!timePeriod.equals("")) {
+            if (timePeriod.equals("")) {
+                return null;
+            } else {
                 switch (timePeriod.indexOf("-")) {
                     case 0:
                         if (timePeriod.length() != 5) {
@@ -454,6 +475,7 @@ public class EStoreSearch {
                 throw new InvalidInputException(MAX_TRIES_MSG);
             }
         } while (exceptionFlag);
+        return matchingProducts;
     }
 
     /**
@@ -461,7 +483,7 @@ public class EStoreSearch {
      *
      * @param matchingProducts
      */
-    private void printMatchingProducts(ArrayList<Product> matchingProducts) {
+    private void printMatchingProducts(HashSet<Product> matchingProducts) {
         if (matchingProducts.isEmpty()) {
             System.out.println("None of the products match your search criteria.");
         } else {
@@ -474,78 +496,57 @@ public class EStoreSearch {
                 System.out.println(finalProduct.toString());
             }
         }
+
+        matchingProducts.clear();
     }
 
     /**
      * Performs search
      */
     private void executeSearch() {
-        ArrayList<Product> matchingProducts = new ArrayList<>();
-        ArrayList<Product> matchingIdProducts = new ArrayList<>();
-        ArrayList<Product> matchingKeywordProducts = new ArrayList<>();
-        ArrayList<Product> matchingTimePeriodProducts = new ArrayList<>();
+        Boolean matchingProductFlag = false;
+
+        HashSet<Product> matchingIdProducts = new HashSet<>();
+        HashSet<Product> matchingKeywordProducts = new HashSet<>();
+        HashSet<Product> matchingTimePeriodProducts = new HashSet<>();
+
+        HashSet<Product> productsCopy = new HashSet<>(products);
+
+        ArrayList<HashSet<Product>> matchingProducts = new ArrayList<>();
 
         try {
-            promptUserAddMatchingId(matchingIdProducts);
+            matchingProducts.add(promptUserAddMatchingId(matchingIdProducts));
         } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
-        promptUserAddMatchingKeyword(matchingKeywordProducts);
+
+        matchingProducts.add(promptUserAddMatchingKeyword(matchingKeywordProducts));
 
         try {
-            promptUserAddMatchingTimePeriod(matchingTimePeriodProducts);
+            matchingProducts.add(promptUserAddMatchingTimePeriod(matchingTimePeriodProducts));
         } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             return;
         }
 
-        if (matchingIdProducts.size() == 1) {
-            if (matchingKeywordProducts.size() > 0) {
-                for (Product matchingKeywordProduct : matchingKeywordProducts) {
-                    if (matchingIdProducts.get(0).equals(matchingKeywordProduct)) {
-                        matchingProducts.add(matchingKeywordProduct);
-                    }
-                }
-            }
-            if (matchingTimePeriodProducts.size() > 0) {
-                for (Product matchingTimePeriodProduct : matchingTimePeriodProducts) {
-                    if (matchingIdProducts.get(0).equals(matchingTimePeriodProduct)) {
-                        matchingProducts.add(matchingTimePeriodProduct);
-                    }
-                }
-            }
-            if (matchingKeywordProducts.size() == 0 && matchingTimePeriodProducts.size() == 0) {
-                matchingProducts.add(matchingIdProducts.get(0));
-            }
-        } else if (matchingKeywordProducts.size() > 0) {
-            if (matchingTimePeriodProducts.size() > 0) {
-                for (Product matchingKeywordProduct : matchingKeywordProducts) {
-                    for (Product matchingTimePeriodProduct : matchingTimePeriodProducts) {
-                        if (matchingKeywordProduct.equals(matchingTimePeriodProduct)) {
-                            matchingProducts.add(matchingKeywordProduct);
-                        }
-                    }
-                }
-            } else {
-                for (Product matchingKeywordProduct : matchingKeywordProducts) {
-                    matchingProducts.add(matchingKeywordProduct);
-                }
-            }
-        } else {
-            for (Product matchingTimePeriodProduct : matchingTimePeriodProducts) {
-                matchingProducts.add(matchingTimePeriodProduct);
+        for (HashSet<Product> matchingProduct : matchingProducts) {
+            if (matchingProduct != null) {
+                productsCopy.retainAll(matchingProduct);
+                matchingProductFlag = true;
             }
         }
-        printMatchingProducts(matchingProducts);
-    }
 
-    private void printProducts() {
-        for (Product product : products) {
-            System.out.println(product.toString());
+        if (!matchingProductFlag) {
+            productsCopy.clear();
         }
+
+        printMatchingProducts(productsCopy);
     }
 
+    /**
+     * Saves products to output.txt
+     */
     private void saveProducts() {
         PrintWriter outputStream = null;
         try {
@@ -600,6 +601,12 @@ public class EStoreSearch {
         } while (userChoice != MainMenuOption.QUIT);
     }
 
+    /**
+     * Get attribute from line where attribute = "value"
+     *
+     * @param line of text
+     * @return attribute or newline
+     */
     private String getAttribute(String line) {
         String[] lineTokens = line.split(" ?=");
         if (lineTokens.length > 1) {
@@ -609,6 +616,12 @@ public class EStoreSearch {
         }
     }
 
+    /**
+     * Gets value from line where attribute = "value"
+     * 
+     * @param line of text
+     * @return value string
+     */
     private String getValue(String line) {
         String[] lineTokens = line.split("(?<!\\\\)\"");
         if (lineTokens.length == 2) {
@@ -618,6 +631,12 @@ public class EStoreSearch {
         }
     }
 
+    /**
+     * Loads products from file in the form of attribute = "value" where
+     * products are separated by a blank line
+     * 
+     * @param filename for file filled with products
+     */
     private void loadProducts(String filename) {
         Scanner fileInput = null;
         String type = "", productID = "", name = "", authors = "", publisher = "", maker = "";

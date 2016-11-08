@@ -75,6 +75,10 @@ public class Product {
     public Product() throws InvalidInputException {
         this("000000", " ", MIN_YEAR, 0.0);
     }
+    
+    public Product(Product product) throws InvalidInputException {
+        this(product.id, product.name, product.year, product.price);
+    }
 
     /**
      * Get id

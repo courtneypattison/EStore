@@ -50,6 +50,10 @@ public class Electronic extends Product {
         super();
         maker = "";
     }
+    
+    public Electronic(Electronic electronic) throws InvalidInputException {
+        this(electronic.getId(), electronic.getName(), electronic.getYear(), electronic.getPrice(), electronic.getMaker());
+    }
 
     /**
      * Gets maker

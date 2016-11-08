@@ -54,6 +54,10 @@ public class Book extends Product {
         super();
         author = publisher = "";
     }
+    
+    public Book(Book book) throws InvalidInputException {
+        this(book.getId(), book.getName(), book.getYear(), book.getPrice(), book.getAuthor(), book.getPublisher());
+    }
 
     /**
      * Gets author
