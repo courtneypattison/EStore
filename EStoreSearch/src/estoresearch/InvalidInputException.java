@@ -1,6 +1,7 @@
 package estoresearch;
 
 /**
+ * Checked exception for invalid user input
  *
  * @author Courtney Bodi
  */

@@ -30,7 +30,8 @@ public class Product {
      * @param name of product
      * @param year product released
      * @param price of product in dollars CAD
-     * @throws estoresearch.InvalidInputException
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public Product(String id, String name, int year, double price) throws InvalidInputException {
         if (validateId(id)) {
@@ -64,6 +65,8 @@ public class Product {
      * @param id is a unique 6 digit string
      * @param name of product
      * @param year product released
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public Product(String id, String name, int year) throws InvalidInputException {
         this(id, name, year, 0.0);
@@ -71,11 +74,14 @@ public class Product {
 
     /**
      * Default Product constructor
+     *
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public Product() throws InvalidInputException {
         this("000000", " ", MIN_YEAR, 0.0);
     }
-    
+
     public Product(Product product) throws InvalidInputException {
         this(product.id, product.name, product.year, product.price);
     }
@@ -103,12 +109,14 @@ public class Product {
      * Set id
      *
      * @param id the id to set
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public void setId(String id) throws InvalidInputException {
         if (validateId(id)) {
             this.id = id;
         } else {
-            throw new InvalidInputException (INVALID_ID);
+            throw new InvalidInputException(INVALID_ID);
         }
     }
 
@@ -135,6 +143,8 @@ public class Product {
      * Set name
      *
      * @param name the name to set
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public void setName(String name) throws InvalidInputException {
         if (validateString(name)) {
@@ -167,6 +177,8 @@ public class Product {
      * Set year
      *
      * @param year the year to set
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public void setYear(int year) throws InvalidInputException {
         if (validateYear(year)) {
@@ -192,7 +204,6 @@ public class Product {
      * @return whether or not the price is valid
      */
     private boolean validatePrice(double price) {
-        //return true;
         return price >= NO_PRICE;
     }
 
@@ -200,6 +211,8 @@ public class Product {
      * Set price
      *
      * @param price the price to set
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public void setPrice(double price) throws InvalidInputException {
         if (validatePrice(price)) {
@@ -212,7 +225,7 @@ public class Product {
     /**
      * Check if Products are equal
      *
-     * @param otherObject
+     * @param otherObject other Product object
      * @return whether or not the Products are equal
      */
     @Override
@@ -220,7 +233,7 @@ public class Product {
         if (otherObject == null || getClass() != otherObject.getClass()) {
             return false;
         } else {
-            Product otherProduct = (Product)otherObject;
+            Product otherProduct = (Product) otherObject;
             return id.equals(otherProduct.id)
                     && name.equals(otherProduct.name)
                     && year == otherProduct.year
@@ -344,7 +357,7 @@ public class Product {
 
         pass = !product1.equals(product2);
         System.out.println(pass + "\t!product3.equals(product1)");
-        
+
         System.out.println(product1.toString());
     }
 }

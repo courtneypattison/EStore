@@ -42,7 +42,7 @@ public class EStoreSearch {
     private ArrayList<Product> products = new ArrayList<>();
     private HashMap<String, HashSet<Integer>> keywords = new HashMap<>();
 
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
 
     /**
      * EStoreSearch constructor with all fields
@@ -303,7 +303,7 @@ public class EStoreSearch {
 
         String[] userTokens = userString.split("\\s+");
         if (userTokens.length != 1) {
-            throw new InvalidInputException("Invalid input: only enter one number.");
+            throw new InvalidInputException("Invalid input: enter one number.");
         }
 
         try {
@@ -608,7 +608,7 @@ public class EStoreSearch {
      * @return attribute or newline
      */
     private String getAttribute(String line) {
-        String[] lineTokens = line.split(" ?=");
+        String[] lineTokens = line.split(" *=");
         if (lineTokens.length > 1) {
             return lineTokens[0];
         } else {
@@ -618,7 +618,7 @@ public class EStoreSearch {
 
     /**
      * Gets value from line where attribute = "value"
-     * 
+     *
      * @param line of text
      * @return value string
      */
@@ -634,7 +634,7 @@ public class EStoreSearch {
     /**
      * Loads products from file in the form of attribute = "value" where
      * products are separated by a blank line
-     * 
+     *
      * @param filename for file filled with products
      */
     private void loadProducts(String filename) {
@@ -688,6 +688,9 @@ public class EStoreSearch {
                         products.add(electronic);
                         addKeywordsToHashMap(electronic);
                     }
+                    type = productID = name = authors = publisher = maker = "";
+                    price = Product.NO_PRICE;
+                    year = 0;
 
                 }
             } catch (InvalidInputException e) {

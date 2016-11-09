@@ -19,7 +19,8 @@ public class Electronic extends Product {
      * @param year product released
      * @param price of product in dollars CAD
      * @param maker of product string
-     * @throws estoresearch.InvalidInputException
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public Electronic(String id, String name, int year, double price, String maker) throws InvalidInputException {
         super(id, name, year, price);
@@ -36,7 +37,8 @@ public class Electronic extends Product {
      * @param id is a unique 6 digit string
      * @param name of product
      * @param year product released
-     * @throws estoresearch.InvalidInputException
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public Electronic(String id, String name, int year) throws InvalidInputException {
         super(id, name, year);
@@ -44,13 +46,15 @@ public class Electronic extends Product {
 
     /**
      * Default Electronic constructor
-     * @throws estoresearch.InvalidInputException
+     *
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public Electronic() throws InvalidInputException {
         super();
         maker = "";
     }
-    
+
     public Electronic(Electronic electronic) throws InvalidInputException {
         this(electronic.getId(), electronic.getName(), electronic.getYear(), electronic.getPrice(), electronic.getMaker());
     }
@@ -68,7 +72,8 @@ public class Electronic extends Product {
      * Sets maker
      *
      * @param maker the maker to set
-     * @throws estoresearch.InvalidInputException
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public void setMaker(String maker) throws InvalidInputException {
         if (maker != null) {
@@ -88,7 +93,7 @@ public class Electronic extends Product {
         if (otherObject == null || getClass() != otherObject.getClass()) {
             return false;
         } else {
-            Electronic otherElectronic = (Electronic)otherObject;
+            Electronic otherElectronic = (Electronic) otherObject;
             return super.equals(otherElectronic)
                     && maker.equals(otherElectronic.maker);
         }
@@ -144,7 +149,7 @@ public class Electronic extends Product {
 
         pass = !elec1.equals(elec2);
         System.out.println(pass + "\t!elec1.equals(elec2)");
-        
+
         System.out.println(elec1.toString());
 
     }
