@@ -13,15 +13,16 @@ public class SUV extends Car {
     /**
      * SUV constructor
      * 
-     * @param year
      * @param brandAndModel
+     * @param year
      * @param price
      * @param numSeats
      * @param isAllTerrain
      * @param tireBrand 
+     * @throws java.lang.Exception 
      */
-    public SUV(int year, String brandAndModel, int price, int numSeats, boolean isAllTerrain, String tireBrand) {
-        super(year, brandAndModel, price);
+    public SUV(String brandAndModel, int year, int price, int numSeats, boolean isAllTerrain, String tireBrand) throws Exception {
+        super(brandAndModel, year, price);
         this.numSeats = numSeats;
         this.isAllTerrain = isAllTerrain;
         this.tireBrand = tireBrand;
@@ -80,7 +81,12 @@ public class SUV extends Car {
     }
     
     @Override
+    public String toString() {
+        return super.toString() + numSeats + isAllTerrain + tireBrand;
+    }
+    
+    @Override
     public String dataDump() {
-        return "SUV: " + getBrandAndModel().split("\\s")[1] + " " + getTireBrand() + " " + getNumSeats() + " " + getIsAllTerrain(); 
+        return getBrandAndModel().split("\\s")[1] + " " + getYear() + " " + getPrice() + " 1" + getNumSeats() + " " + getIsAllTerrain() + " " + getTireBrand(); 
     }
 }

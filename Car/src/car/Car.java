@@ -1,8 +1,11 @@
 package car;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -13,22 +16,25 @@ public class Car {
     enum MenuOption {
         NULL,
         ENTER_VEHICLE,
-        PRINT_BRAND_AND_MODEL,
+        PRINT_BRAND_MODEL_YEAR,
         PRINT_AVG_AND_TOTAL,
-        PRINT_YEARS,
         READ_INPUT,
         STD_DATA_DUMP,
         FILE_DATA_DUMP,
+        LOOKUP,
         EXIT
     }
 
     public static final String NEW_LINE = System.lineSeparator();
+    private static final int DEFAULT_PRICE = 50000;
 
     private Scanner keyboardScanner = new Scanner(System.in);
-    private ArrayList<Car> cars = new ArrayList<>();
 
-    private int year;
+    private ArrayList<Car> cars = new ArrayList<>();
+    private HashMap<String, Car> carsMap = new HashMap<>();
+
     private String brandAndModel;
+    private int year;
     private int price;
 
     /**
@@ -37,10 +43,17 @@ public class Car {
      * @param year
      * @param brandAndModel
      * @param price
+     * @throws java.lang.Exception
      */
-    public Car(int year, String brandAndModel, int price) {
-        this.year = year;
+    public Car(String brandAndModel, int year, int price) throws Exception {
         this.brandAndModel = brandAndModel;
+        if (year <= 1986) {
+            throw new Exception("Invalid input: Car cannot be greater than 30 years old.");
+        }
+        this.year = year;
+        if (price < 5000) {
+            throw new Exception("Invalid input: Price must be $5000 or more.");
+        }
         this.price = price;
     }
 
@@ -50,21 +63,24 @@ public class Car {
      * @param year
      * @param brandAndModel
      */
-    public Car(int year, String brandAndModel) {
-        this.year = year;
+    public Car(String brandAndModel, int year) throws Exception {
         this.brandAndModel = brandAndModel;
-        price = 50000;
+        if (year <= 1986) {
+            throw new Exception("Invalid input: Car cannot be greater than 30 years old.");
+        }
+        this.year = year;
+        price = DEFAULT_PRICE;
     }
 
     /**
      * Default Car constructor
      */
     public Car() {
-        year = 0;
         brandAndModel = "";
-        price = 0;
+        year = 0;
+        price = DEFAULT_PRICE;
     }
-    
+
     /**
      * @return the year
      */
@@ -106,57 +122,98 @@ public class Car {
     public void setPrice(int price) {
         this.price = price;
     }
-    
+
+    @Override
+    public String toString() {
+        return brandAndModel + " " + year + " " + price;
+    }
+
     private void printMenu() {
         System.out.println("(1) Enter the info about a new vehicle (either a car or a SUV)." + NEW_LINE
-                + "(2) Print out brand and model, delimited by spaces, for all vehicles." + NEW_LINE
+                + "(2) Print out brand, model, and year, delimited by spaces, for all vehicles." + NEW_LINE
                 + "(3) Print average vehicle cost, as well as total number of vehicles." + NEW_LINE
-                + "(4) Print out all vehicle years." + NEW_LINE
-                + "(5) Read input file." + NEW_LINE
-                + "(6) Standard Data dump." + NEW_LINE
-                + "(7) File Data dump." + NEW_LINE
+                + "(4) Read from input file." + NEW_LINE
+                + "(5) Standard Data dump." + NEW_LINE
+                + "(6) File Data dump." + NEW_LINE
+                + "(7) Lookup via HashMap with brand, model, and year" + NEW_LINE
                 + "(8) End program");
     }
 
-    private void populateCar(Car newCar) {
-        int year, price;
+    private String createKey(Car car) {
+        String key = car.getBrandAndModel().replaceAll("\\s", "");
+        key += car.getYear();
+        return key;
+    }
+
+    private int promptUserGetYear() throws Exception {
+        System.out.println("Enter year:");
+        String yearString = keyboardScanner.nextLine();
+        if (yearString.matches("^\\d+$")) {
+            year = Integer.parseInt(yearString);
+            return year;
+        } else {
+            throw new Exception("Invalid input: You must enter a number.");
+        }
+    }
+
+    private String promptUserGetBrandAndModel() throws Exception {
         String brandAndModel;
 
         System.out.println("Enter vehicle brand and model:");
         brandAndModel = keyboardScanner.nextLine();
         String tokensCheck[] = brandAndModel.split(" +");
         if (tokensCheck.length != 2 || tokensCheck[0].matches("")) {
-            System.out.println("Invalid input: You must enter a brand and model.");
-            return;
+            throw new Exception("Invalid input: You must enter a brand and model.");
         }
-        newCar.setBrandAndModel(brandAndModel);
+        return brandAndModel;
+    }
 
-        System.out.println("Enter year:");
-        String yearString = keyboardScanner.nextLine();
-        if (yearString.matches("^\\d+$")) {
-            year = Integer.parseInt(yearString);
-            newCar.setYear(year);
-        } else {
-            System.out.println("Invalid input: You must enter a number.");
-            return;
-        }
-
+    private int promptUserGetPrice() throws Exception {
         System.out.println("Enter price, or leave blank:");
         String priceString = keyboardScanner.nextLine();
         if (priceString.matches("^\\d+$")) {
-            price = Integer.parseInt(priceString);
-            newCar.setPrice(price);
+            return Integer.parseInt(priceString);
         } else if (priceString.matches("")) {
-            newCar.setPrice(50000);
+            return DEFAULT_PRICE;
         } else {
-            System.out.println("Invalid input: You must enter a number.");
-            return;
+            throw new Exception("Invalid input: You must enter a number.");
         }
-        
     }
 
-    private void promptUserAddVehicle() {
-        int userChoice;
+    private int promptUserGetNumSeats() throws Exception {
+        System.out.println("Enter number of seats:");
+        String numSeatsString = keyboardScanner.nextLine();
+        if (numSeatsString.matches("^\\d+$")) {
+            return Integer.parseInt(numSeatsString);
+        } else {
+            throw new Exception("Invalid input: You must enter a number.");
+        }
+    }
+
+    private Boolean promptUserIsAllTerrain() throws Exception {
+        System.out.println("Enter 1 or 0 to indicate if the SUV is all terrain or not:");
+        String isAllTerrainString = keyboardScanner.nextLine();
+        if (isAllTerrainString.matches("[01]")) {
+            return Boolean.parseBoolean(isAllTerrainString);
+        } else {
+            throw new Exception("Invalid input: You must enter 0 or 1.");
+        }
+    }
+
+    private String promptUserTireBrand() throws Exception {
+        System.out.println("Enter tire brand:");
+        String tireBrand = keyboardScanner.nextLine();
+        String[] tireBrandTokens = tireBrand.split("\\s+");
+        if (tireBrandTokens.length == 1) {
+            return tireBrand;
+        } else {
+            throw new Exception("Invalid input: You must enter a single word.");
+        }
+    }
+
+    private void promptUserAddVehicle() throws Exception {
+        int userChoice, year, price;
+        String brandAndModel;
 
         System.out.println("(1) Enter car" + NEW_LINE
                 + "(2) Enter SUV");
@@ -166,56 +223,43 @@ public class Car {
         if (userString.matches("[12]")) {
             userChoice = Integer.parseInt(userString);
         } else {
-            System.out.println("You must enter a digit between 1 and 2.");
-            return;
+            throw new Exception("Invalid input: you must enter either 1 or 2.");
+        }
+
+        try {
+            brandAndModel = promptUserGetBrandAndModel();
+            year = promptUserGetYear();
+            String key = createKey(new Car(brandAndModel, year));
+            if (carsMap.containsKey(key)) {
+                throw new Exception("Invalid input: a car with this brand, model, and year already exists.");
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
 
         if (userChoice == 1) {
-            Car car = new Car();
-            populateCar(car);
-            cars.add(car);
+            try {
+                Car car = new Car(brandAndModel, year, promptUserGetPrice());
+                cars.add(car);
+                carsMap.put(createKey(car), car);
+            } catch (Exception e) {
+                throw new Exception(e.getMessage());
+            }
         } else {
-            SUV suv = new SUV();
-            populateCar(suv);
-            
-            System.out.println("Enter number of seats:");
-            String numSeatsString = keyboardScanner.nextLine();
-            if (numSeatsString.matches("^\\d+$")) {
-                int numSeats = Integer.parseInt(numSeatsString);
-                suv.setNumSeats(numSeats);
-            } else {
-                System.out.println("Invalid input: You must enter a number.");
-                return;
+            try {
+                SUV suv = new SUV(brandAndModel, year, promptUserGetPrice(), promptUserGetNumSeats(), promptUserIsAllTerrain(), promptUserTireBrand());
+                cars.add(suv);
+                carsMap.put(createKey(suv), suv);
+            } catch (Exception e) {
+                throw new Exception(e.getMessage());
             }
-            
-            System.out.println("Enter 1 or 0 to indicate if the SUV is all terrain or not:");
-            String isAllTerrainString = keyboardScanner.nextLine();
-            if (isAllTerrainString.matches("[01]")) {
-                Boolean isAllTerrain = Boolean.parseBoolean(isAllTerrainString);
-                suv.setIsAllTerrain(isAllTerrain);
-            } else {
-                System.out.println("Invalid input: You must enter 0 or 1.");
-                return;
-            }
-            
-            System.out.println("Enter tire brand:");
-            String tireBrand = keyboardScanner.nextLine();
-            String[] tireBrandTokens = tireBrand.split("\\s+");
-            if (tireBrandTokens.length == 1) {
-                suv.setTireBrand(tireBrand);
-            } else {
-                System.out.println("Invalid input: You must enter a single word.");
-                return;
-            }
-            cars.add(suv);
         }
     }
 
-    private void printBrandAndModel() {
+    private void printBrandModelYear() {
         for (Car car : cars) {
             String[] tokens = car.getBrandAndModel().split(" +");
-            System.out.println("Brand: " + tokens[0] + NEW_LINE
-                    + "Model: " + tokens[1] + NEW_LINE);
+            System.out.println(tokens[0] + " " + tokens[1] + " " + car.getYear());
         }
     }
 
@@ -244,36 +288,41 @@ public class Car {
 
     private void readAndParseInputFile() {
         System.out.println("Enter the name of the input file:");
-        try {
-            File file = new File(keyboardScanner.nextLine());
-            Scanner fileScanner = new Scanner(file);
-            while (fileScanner.hasNextLine()) {
-                String[] carTokens = fileScanner.nextLine().split("\\s");
+        String filename = keyboardScanner.nextLine();
+        Scanner fileInput = null;
 
-                if (Integer.parseInt(carTokens[4]) == 0) {
-                    Car car = new Car();
-                    car.setBrandAndModel(carTokens[0].concat(" " + carTokens[1]));
-                    car.setYear(Integer.parseInt(carTokens[2]));
-                    car.setPrice(Integer.parseInt(carTokens[3]));
-                    cars.add(car);
-                } else {
-                    SUV suv = new SUV();
-                    suv.setBrandAndModel(carTokens[0].concat(" " + carTokens[1]));
-                    suv.setYear(Integer.parseInt(carTokens[2]));
-                    suv.setPrice(Integer.parseInt(carTokens[3]));
-                    suv.setNumSeats(Integer.parseInt(carTokens[5]));
-                    suv.setIsAllTerrain(Boolean.parseBoolean(carTokens[6]));
-                    suv.setTireBrand(carTokens[7]);
-                    cars.add(suv);
-                }
-            }
-        } catch (Exception e) {
+        try {
+            fileInput = new Scanner(new FileInputStream(filename));
+
+        } catch (FileNotFoundException e) {
             System.out.println("Could not open file.");
+            System.exit(0);
         }
+
+        while (fileInput.hasNextLine()) {
+            String[] carTokens = fileInput.nextLine().split("\\s");
+
+            String brandAndModel = carTokens[0].concat(" " + carTokens[1]);
+            try {
+                if (Integer.parseInt(carTokens[4]) == 0) {
+                    Car car = new Car(brandAndModel, Integer.parseInt(carTokens[2]), Integer.parseInt(carTokens[3]));
+                    cars.add(car);
+                    carsMap.put(createKey(car), car);
+                } else {
+                    SUV suv = new SUV(brandAndModel, Integer.parseInt(carTokens[2]), Integer.parseInt(carTokens[3]), Integer.parseInt(carTokens[5]), Boolean.parseBoolean(carTokens[6]), carTokens[7]);
+                    cars.add(suv);
+                    carsMap.put(createKey(suv), suv);
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        fileInput.close();
     }
 
     public String dataDump() {
-        return getBrandAndModel() + " " + getYear() + " " + getPrice();
+        return getBrandAndModel() + " " + getYear() + " " + getPrice() + " 0";
     }
 
     private void outputDataDumpToFile() {
@@ -286,6 +335,24 @@ public class Car {
             fileWriter.close();
         } catch (Exception e) {
             System.out.println("Could not write to output.txt");
+        }
+    }
+
+    private void lookupCar() {
+        System.out.println("Enter the brand, model, and year of a car:");
+        String userString = keyboardScanner.nextLine();
+        String[] tokens = userString.split("\\s+");
+        if (tokens.length != 3) {
+            System.out.println("Invalid input: Lookup must be in the following format: Volvo, V70, 2002");
+            return;
+        }
+        String key = userString.replaceAll(",\\s+", "");
+        if (carsMap.containsKey(key)) {
+            Car car = carsMap.get(key);
+            System.out.println("Cars found:" + NEW_LINE
+                    + car.toString());
+        } else {
+            System.out.println("No Matching cars found.");
         }
     }
 
@@ -306,16 +373,17 @@ public class Car {
 
             switch (userChoice) {
                 case ENTER_VEHICLE:
-                    promptUserAddVehicle();
+                    try {
+                        promptUserAddVehicle();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
-                case PRINT_BRAND_AND_MODEL:
-                    printBrandAndModel();
+                case PRINT_BRAND_MODEL_YEAR:
+                    printBrandModelYear();
                     break;
                 case PRINT_AVG_AND_TOTAL:
                     printAvgAndTotal();
-                    break;
-                case PRINT_YEARS:
-                    printYears();
                     break;
                 case READ_INPUT:
                     readAndParseInputFile();
@@ -328,6 +396,8 @@ public class Car {
                 case FILE_DATA_DUMP:
                     outputDataDumpToFile();
                     break;
+                case LOOKUP:
+                    lookupCar();
                 case EXIT:
                     break;
                 default:

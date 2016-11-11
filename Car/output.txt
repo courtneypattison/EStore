@@ -1,6 +1,6 @@
-Porsche Cayman 2016 78000
-Volvo V70 2002 4500
-SUV: Expedition Firestone 6 true
-SUV: Tahoe Michelin 5 false
-Toyota Camry 2005 8000
-SUV: civic michelin 3 false
+Porsche Cayman 2016 78000 0
+Volvo V70 2002 5000 0
+SUV: Expedition 200938000 16 trueFirestone
+SUV: Tahoe 201141000 15 falseMichelin
+Toyota Camry 2005 8000 0
+Toyota Corolla 2017 15000 0
