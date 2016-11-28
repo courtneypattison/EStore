@@ -1,6 +1,6 @@
+foo 1999 50000 12 false hey
 Porsche Cayman 2016 78000 0
 Volvo V70 2002 5000 0
-SUV: Expedition 200938000 16 trueFirestone
-SUV: Tahoe 201141000 15 falseMichelin
+Expedition 2009 38000 16 true Firestone
+Tahoe 2011 41000 15 false Michelin
 Toyota Camry 2005 8000 0
-Toyota Corolla 2017 15000 0

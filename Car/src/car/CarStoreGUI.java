@@ -5,10 +5,13 @@
  */
 package car;
 
+import static car.Car.DEFAULT_PRICE;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -19,7 +22,7 @@ import javax.swing.border.*;
  *
  * @author courtney
  */
-public class CarStoreGUI implements ActionListener, ItemListener {
+public class CarStoreGUI implements ActionListener {
 
     private JPanel cards;
 
@@ -27,12 +30,13 @@ public class CarStoreGUI implements ActionListener, ItemListener {
     public static final int HEIGHT = 500;
 
     public static final int LINES = 10;
-    public static final int CHARS_PER_LINE = 40;
+    public static final int CHARS_PER_LINE = 20;
 
     public static final Insets BORDER_SIZE = new Insets(10, 10, 10, 10);
     public static final Dimension COMPONENT_SIZE = new Dimension(600, 40);
 
-    public static final String ADD_VEHICLE = "Enter info about new vehicle";
+    public static final String ADD_VEHICLE = "Enter info about new car";
+    public static final String ADD_SUV = "Enter info about new suv";
     public static final String PRINT_VEHICLE_INFO = "Print vehicle information";
     public static final String READ_INPUT_FILE = "Read input file";
     public static final String DATA_DUMP = "Data dump";
@@ -64,6 +68,7 @@ public class CarStoreGUI implements ActionListener, ItemListener {
         JMenu menu = new JMenu("Commands");
 
         addMenuItem(menu, ADD_VEHICLE);
+        addMenuItem(menu, ADD_SUV);
         addMenuItem(menu, PRINT_VEHICLE_INFO);
         addMenuItem(menu, READ_INPUT_FILE);
         addMenuItem(menu, DATA_DUMP);
@@ -98,21 +103,101 @@ public class CarStoreGUI implements ActionListener, ItemListener {
     }
 
     private JTextField addTextField(Container pane, String text) {
-        JTextField textField = new JTextField("   " + text, CHARS_PER_LINE);
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.ORANGE);
+        panel.add(new JLabel("   " + text));
+        JTextField textField = new JTextField(CHARS_PER_LINE);
+        panel.add(textField);
         styleBoxLayoutComponent(textField);
-        pane.add(textField);
+        pane.add(panel);
         return textField;
     }
 
-    private void addComboBox(JPanel pane) {
-        String[] comboBoxItems = {"Car", "SUV"};
-        JComboBox comboBox = new JComboBox(comboBoxItems);
-        styleBoxLayoutComponent(comboBox);
+    private JPanel createAddSUVCard() {
+        JPanel addVehicleCard = new JPanel();
+        styleCard(addVehicleCard);
 
-        comboBox.setEditable(false);
-        comboBox.addItemListener(this);
+        JPanel addVehicleInputFields = new JPanel();
+        addVehicleInputFields.setLayout(new BoxLayout(addVehicleInputFields, BoxLayout.Y_AXIS));
+        addVehicleInputFields.setBackground(Color.ORANGE);
 
-        pane.add(comboBox);
+        JTextField brandAndModelTextField = addTextField(addVehicleInputFields, "Brand and model: ");
+        JTextField yearTextField = addTextField(addVehicleInputFields, "Year: ");
+        JTextField priceTextField = addTextField(addVehicleInputFields, "Price: ");
+        JTextField numSeatsTextField = addTextField(addVehicleInputFields, "Number of seats: ");
+        JTextField isAllTerrainTextField = addTextField(addVehicleInputFields, "Is all terrain: ");
+        JTextField tireBrandTextField = addTextField(addVehicleInputFields, "Tire brand: ");
+
+        JPanel addVehicleButtons = new JPanel();
+        addVehicleButtons.setBackground(Color.ORANGE);
+        JButton submit = new JButton("Add");
+        submit.addActionListener(ae -> {
+            String brandAndModel = brandAndModelTextField.getText();
+            String tokensCheck[] = brandAndModel.split(" +");
+            if (tokensCheck.length != 2 || tokensCheck[0].matches("")) {
+                textArea.append("Invalid input: You must enter a brand and model.\n");
+            }
+
+            String yearString = yearTextField.getText();
+            int year = 0;
+            if (yearString.matches("^\\d+$")) {
+                year = Integer.parseInt(yearString);
+            } else {
+                textArea.append("Invalid input: You must enter a number.\n");
+            }
+
+            String priceString = priceTextField.getText();
+            int price = DEFAULT_PRICE;
+            if (priceString.matches("^\\d+$")) {
+                price = Integer.parseInt(priceString);
+            } else if (priceString.matches("")) {
+                price = DEFAULT_PRICE;
+            } else {
+                textArea.append("Invalid input: You must enter a number.\n");
+            }
+
+            String numSeatsString = numSeatsTextField.getText();
+            int numSeats = 0;
+            if (numSeatsString.matches("^\\d+$")) {
+                numSeats = Integer.parseInt(numSeatsString);
+            } else {
+                textArea.append("Invalid input: You must enter a number.\n");
+            }
+
+            String isAllTerrainString = isAllTerrainTextField.getText();
+            Boolean isAllTerrain = true;
+            if (isAllTerrainString.matches("[01]")) {
+                isAllTerrain = Boolean.parseBoolean(isAllTerrainString);
+            } else {
+                textArea.append("Invalid input: You must enter 0 or 1.\n");
+            }
+
+            String tireBrand = tireBrandTextField.getText();
+            String[] tireBrandTokens = tireBrand.split("\\s+");
+            if (tireBrandTokens.length == 1) {
+                tireBrand = tireBrand;
+            } else {
+                textArea.append("Invalid input: You must enter a single word.\n");
+            }
+
+            try {
+                String key = createKey(new Car(brandAndModel, year));
+                if (carsMap.containsKey(key)) {
+                    textArea.append("Invalid input: a car with this brand, model, and year already exists.\n");
+                }
+                SUV suv = new SUV(brandAndModel, year, price, numSeats, isAllTerrain, tireBrand);
+                cars.add(suv);
+                carsMap.put(createKey(suv), suv);
+            } catch (Exception e) {
+                textArea.append(e.getMessage() + "\n");
+            }
+        });
+        addVehicleButtons.add(submit);
+
+        addVehicleCard.add(addVehicleInputFields, BorderLayout.LINE_START);
+        addVehicleCard.add(addVehicleButtons, BorderLayout.LINE_END);
+
+        return addVehicleCard;
     }
 
     private JPanel createAddVehicleCard() {
@@ -122,15 +207,52 @@ public class CarStoreGUI implements ActionListener, ItemListener {
         JPanel addVehicleInputFields = new JPanel();
         addVehicleInputFields.setLayout(new BoxLayout(addVehicleInputFields, BoxLayout.Y_AXIS));
         addVehicleInputFields.setBackground(Color.ORANGE);
-        addComboBox(addVehicleInputFields);
 
-        JTextField brandAndModel = addTextField(addVehicleInputFields, "Brand and model: ");
-        JTextField year = addTextField(addVehicleInputFields, "Year: ");
-        JTextField price = addTextField(addVehicleInputFields, "Price: ");
+        JTextField brandAndModelTextField = addTextField(addVehicleInputFields, "Brand and model: ");
+        JTextField yearTextField = addTextField(addVehicleInputFields, "Year: ");
+        JTextField priceTextField = addTextField(addVehicleInputFields, "Price: ");
 
         JPanel addVehicleButtons = new JPanel();
         addVehicleButtons.setBackground(Color.ORANGE);
-        addVehicleButtons.add(new JLabel("yo foo"));
+        JButton submit = new JButton("Add");
+        submit.addActionListener(ae -> {
+            String brandAndModel = brandAndModelTextField.getText();
+            String tokensCheck[] = brandAndModel.split(" +");
+            if (tokensCheck.length != 2 || tokensCheck[0].matches("")) {
+                textArea.append("Invalid input: You must enter a brand and model.\n");
+            }
+
+            String yearString = yearTextField.getText();
+            int year = 0;
+            if (yearString.matches("^\\d+$")) {
+                year = Integer.parseInt(yearString);
+            } else {
+                textArea.append("Invalid input: You must enter a number.\n");
+            }
+
+            String priceString = priceTextField.getText();
+            int price = DEFAULT_PRICE;
+            if (priceString.matches("^\\d+$")) {
+                price = Integer.parseInt(priceString);
+            } else if (priceString.matches("")) {
+                price = DEFAULT_PRICE;
+            } else {
+                textArea.append("Invalid input: You must enter a number.\n");
+            }
+
+            try {
+                String key = createKey(new Car(brandAndModel, year));
+                if (carsMap.containsKey(key)) {
+                    textArea.append("Invalid input: a car with this brand, model, and year already exists.\n");
+                }
+                Car car = new Car(brandAndModel, year, price);
+                cars.add(car);
+                carsMap.put(createKey(car), car);
+            } catch (Exception e) {
+                textArea.append(e.getMessage() + "\n");
+            }
+        });
+        addVehicleButtons.add(submit);
 
         addVehicleCard.add(addVehicleInputFields, BorderLayout.LINE_START);
         addVehicleCard.add(addVehicleButtons, BorderLayout.LINE_END);
@@ -138,7 +260,7 @@ public class CarStoreGUI implements ActionListener, ItemListener {
         return addVehicleCard;
     }
 
-    private JPanel createPrintVehicleInfo() {
+    private JPanel createPrintVehicleInfoCard() {
         JPanel printVehicleInfo = new JPanel();
         styleCard(printVehicleInfo);
         printVehicleInfo.setLayout(new BoxLayout(printVehicleInfo, BoxLayout.Y_AXIS));
@@ -172,19 +294,20 @@ public class CarStoreGUI implements ActionListener, ItemListener {
 
         return printVehicleInfo;
     }
-    
+
     private String createKey(Car car) {
         String key = car.getBrandAndModel().replaceAll("\\s", "");
         key += car.getYear();
         return key;
     }
 
-    private JPanel createReadInputFile() {
+    private JPanel createReadInputFileCard() {
         JPanel readInputFileCard = new JPanel();
         styleCard(readInputFileCard);
         readInputFileCard.setLayout(new BoxLayout(readInputFileCard, BoxLayout.Y_AXIS));
 
         JPanel button = new JPanel();
+        button.setBackground(Color.ORANGE);
         button.add(new JLabel("File name: "));
         JTextField readInputFileText = new JTextField(CHARS_PER_LINE);
         button.add(readInputFileText);
@@ -223,18 +346,71 @@ public class CarStoreGUI implements ActionListener, ItemListener {
             fileInput.close();
         });
         button.add(readInputFileButton);
-        
+
         readInputFileCard.add(button);
 
         return readInputFileCard;
+    }
+
+    private JPanel createDataDumpCard() {
+        JPanel dataDumpCard = new JPanel();
+        styleCard(dataDumpCard);
+        dataDumpCard.setLayout(new BoxLayout(dataDumpCard, BoxLayout.Y_AXIS));
+
+        JButton stdDataDump = new JButton(STD_DATA_DUMP);
+        stdDataDump.addActionListener(ae -> {
+            for (Car car : cars) {
+                textArea.append(car.dataDump() + "\n");
+            }
+        });
+        dataDumpCard.add(stdDataDump);
+
+        JButton fileDataDump = new JButton(FILE_DATA_DUMP);
+        fileDataDump.addActionListener(ae -> {
+            try {
+                File outputFile = new File("./output.txt");
+                PrintWriter fileWriter = new PrintWriter(outputFile);
+                for (Car car : cars) {
+                    fileWriter.println(car.dataDump());
+                }
+                fileWriter.close();
+            } catch (Exception e) {
+                textArea.append("Could not write to output.txt\n");
+            }
+        });
+        dataDumpCard.add(fileDataDump);
+
+        return dataDumpCard;
+    }
+
+    private JPanel createLookupCard() {
+        JPanel lookupCard = new JPanel();
+        styleCard(lookupCard);
+        lookupCard.setLayout(new BoxLayout(lookupCard, BoxLayout.Y_AXIS));
+
+        JPanel lookup = new JPanel();
+        lookup.setBackground(Color.ORANGE);
+        lookup.add(new JLabel("Enter the brand, model, and year of a car:"));
+        JTextField lookupTextField = new JTextField(CHARS_PER_LINE);
+        lookup.add(lookupTextField);
+        JButton lookupButton = new JButton("Submit");
+        lookupButton.addActionListener(e -> lookupActionPerformed(e, lookupTextField));
+        lookup.add(lookupButton);
+
+        lookupCard.add(lookup);
+
+        return lookupCard;
     }
 
     private void addCards(Container pane) {
         cards = new JPanel(new CardLayout());
         cards.add(createWelcomeCard());
         cards.add(createAddVehicleCard(), ADD_VEHICLE);
-        cards.add(createPrintVehicleInfo(), PRINT_VEHICLE_INFO);
-        cards.add(createReadInputFile(), READ_INPUT_FILE);
+        cards.add(createAddSUVCard(), ADD_SUV);
+        cards.add(createPrintVehicleInfoCard(), PRINT_VEHICLE_INFO);
+        cards.add(createReadInputFileCard(), READ_INPUT_FILE);
+        cards.add(createDataDumpCard(), DATA_DUMP);
+        cards.add(createLookupCard(), LOOKUP);
 
         pane.add(cards, BorderLayout.CENTER);
     }
@@ -247,6 +423,23 @@ public class CarStoreGUI implements ActionListener, ItemListener {
 
         pane.add(scrollPane, BorderLayout.PAGE_END);
     }
+    
+    private void lookupActionPerformed(ActionEvent e, JTextField lookupTextField) {
+        String userString = lookupTextField.getText();
+            String[] tokens = userString.split("\\s+");
+            if (tokens.length != 3) {
+                textArea.append("Invalid input: Lookup must be in the following format: Volvo, V70, 2002\n");
+                return;
+            }
+            String key = userString.replaceAll(",\\s+", "");
+            if (carsMap.containsKey(key)) {
+                Car car = carsMap.get(key);
+                textArea.append("Cars found:\n"
+                        + car.toString() + "\n");
+            } else {
+                textArea.append("No Matching cars found.\n");
+            }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -256,11 +449,6 @@ public class CarStoreGUI implements ActionListener, ItemListener {
 
         CardLayout cardLayout = (CardLayout) (cards.getLayout());
         cardLayout.show(cards, (String) e.getActionCommand());
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private static void createAndShowGUI() {

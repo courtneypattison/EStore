@@ -28,8 +28,3 @@ type = "electronics"
 productID = "000000"
 name = "iPod yo"
 year = "2013"
-
-type = "electronics"
-productID = "777777"
-name = "iPod yo"
-year = "not a number"
