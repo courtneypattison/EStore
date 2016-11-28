@@ -9,20 +9,18 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Courtney Bodi
  */
-public class EStoreSearchGUI implements ActionListener {
+public class EStoreSearchGUI implements ActionListener, ItemListener {
 
-    private EStoreSearch eStoreSearch = new EStoreSearch();
+    private final EStoreSearch eStoreSearch = new EStoreSearch();
 
-    private JPanel cards;
+    private JPanel cards, authorsPane, publisherPane, makerPane;
     private JTextArea memoDisplay;
 
-    private JTextField productIDSearch,
-            keywordsSearch,
-            startYearSearch,
-            endYearSearch;
+    private JTextField productID, name, price, year, authors, publisher, maker,
+            productIDSearch, keywordsSearch, startYearSearch, endYearSearch;
 
     private JButton addButton, searchButton, resetAddButton, resetSearchButton;
-
+    
     public static final int WIDTH = 809;
     public static final int HEIGHT = 500;
 
@@ -30,20 +28,22 @@ public class EStoreSearchGUI implements ActionListener {
     public static final int CHARS_PER_LINE = 20;
 
     public static final Insets BORDER_SIZE = new Insets(10, 10, 10, 10);
-    public static final Dimension COMPONENT_SIZE = new Dimension(600, 40);
+    public static final Dimension COMPONENT_SIZE = new Dimension(800, 30);
 
     public static final String ADD = "Add";
     public static final String SEARCH = "Search";
     public static final String QUIT = "Quit";
+    
+    public static final String BOOK = "Book";
+    public static final String ELECTRONIC = "Electronic";
+    
+    private String productType = BOOK;
 
     @Override
     public void actionPerformed(ActionEvent e) {
         String menuItemName = (String) e.getActionCommand();
 
         if (menuItemName.equals(QUIT)) {
-            for (Product product : eStoreSearch.getProducts()) {
-                System.out.println(product.toString());
-            }
             eStoreSearch.saveProducts();
             System.exit(0);
         }
@@ -110,24 +110,153 @@ public class EStoreSearchGUI implements ActionListener {
 
         return textField;
     }
+    
+    @Override
+    public void itemStateChanged(ItemEvent e) { 
+        String comboBoxItemName = (String) e.getItem();
+
+        if (comboBoxItemName.equals(BOOK)) {
+            productType = BOOK;
+            authorsPane.setVisible(true);
+            publisherPane.setVisible(true);
+            makerPane.setVisible(false);
+        } else {
+            productType = ELECTRONIC;
+            authorsPane.setVisible(false);
+            publisherPane.setVisible(false);
+            makerPane.setVisible(true);
+        }
+    }
+    
+    private JPanel createAddInputPane() {
+        JPanel addInputPane = new JPanel();
+        styleBoxLayoutPanel(addInputPane);
+        
+        String[] comboBoxItems = {BOOK, ELECTRONIC};
+        JComboBox comboBox = new JComboBox(comboBoxItems);
+        comboBox.setEditable(false);
+        comboBox.addItemListener(this);
+        comboBox.setMaximumSize(COMPONENT_SIZE);
+        addInputPane.add(comboBox, BorderLayout.PAGE_START); 
+        
+        productID = addLabelledTextField(addInputPane, "Product ID: ");
+        name = addLabelledTextField(addInputPane, "Name: ");
+        price = addLabelledTextField(addInputPane, "Price: ");
+        year = addLabelledTextField(addInputPane, "Year: ");
+        
+        
+        authorsPane = new JPanel();
+        authorsPane.setBackground(Color.ORANGE);
+        authorsPane.setLayout(new BorderLayout());
+        authorsPane.setMaximumSize(COMPONENT_SIZE);
+
+        JLabel authorsLabel = new JLabel("   Authors: ");
+        authors = new JTextField(CHARS_PER_LINE);
+
+        authorsPane.add(authorsLabel, BorderLayout.LINE_START);
+        authorsPane.add(authors);
+
+        addInputPane.add(authorsPane);
+        
+        
+        publisherPane = new JPanel();
+        publisherPane.setBackground(Color.ORANGE);
+        publisherPane.setLayout(new BorderLayout());
+        publisherPane.setMaximumSize(COMPONENT_SIZE);
+
+        JLabel publisherLabel = new JLabel("   Publisher: ");
+        publisher = new JTextField(CHARS_PER_LINE);
+
+        publisherPane.add(publisherLabel, BorderLayout.LINE_START);
+        publisherPane.add(publisher);
+
+        addInputPane.add(publisherPane);
+        
+        
+        makerPane = new JPanel();
+        makerPane.setBackground(Color.ORANGE);
+        makerPane.setLayout(new BorderLayout());
+        makerPane.setMaximumSize(COMPONENT_SIZE);
+
+        JLabel makerLabel = new JLabel("   Publisher: ");
+        maker = new JTextField(CHARS_PER_LINE);
+
+        makerPane.add(makerLabel, BorderLayout.LINE_START);
+        makerPane.add(maker);
+
+        addInputPane.add(makerPane);
+
+        makerPane.setVisible(false); // default is Book
+        
+        return addInputPane;
+    }
+    
+    private void resetAdd() {
+        productID.setText("");
+        name.setText("");
+        price.setText("");
+        year.setText("");
+        authors.setText("");
+        publisher.setText("");
+        maker.setText("");
+    }
+    
+    private void addProduct() {
+        if (productType.equals(BOOK)) {
+            try {
+                eStoreSearch.addBook(productID.getText(), name.getText(),
+                        price.getText(), year.getText(), authors.getText(),
+                        publisher.getText());
+                memoDisplay.setText("Successfully added book!");
+            } catch (InvalidInputException e) {
+                memoDisplay.setText(e.getMessage());
+            }
+        } else {
+            try {
+                eStoreSearch.addElectronic(productID.getText(), name.getText(),
+                        price.getText(), year.getText(), maker.getText());
+                memoDisplay.setText("Successfully added electronic!");
+            } catch (InvalidInputException e) {
+                memoDisplay.setText(e.getMessage());
+            }
+        }
+    }
+    
+    private JPanel createAddButtonPane() {
+        JPanel addButtonPane = new JPanel();
+        styleBoxLayoutPanel(addButtonPane);
+
+        resetAddButton = new JButton("Reset");
+        resetAddButton.addActionListener(e -> resetAdd());
+        addButtonPane.add(resetAddButton);
+
+        addButton = new JButton("Add");
+        addButton.addActionListener(e -> addProduct());
+        addButtonPane.add(addButton);
+
+        return addButtonPane;
+    }
 
     private JPanel createAddCard() {
         JPanel addCard = new JPanel();
         styleCard(addCard);
+        
+        addCard.add(createAddInputPane(), BorderLayout.LINE_START);
+        addCard.add(createAddButtonPane(), BorderLayout.LINE_END);
 
         return addCard;
     }
 
     private JPanel createSearchInputPane() {
-        JPanel inputPane = new JPanel();
-        styleBoxLayoutPanel(inputPane);
+        JPanel searchInputPane = new JPanel();
+        styleBoxLayoutPanel(searchInputPane);
 
-        productIDSearch = addLabelledTextField(inputPane, "Product ID: ");
-        keywordsSearch = addLabelledTextField(inputPane, "Name keywords: ");
-        startYearSearch = addLabelledTextField(inputPane, "Start year: ");
-        endYearSearch = addLabelledTextField(inputPane, "End year: ");
+        productIDSearch = addLabelledTextField(searchInputPane, "Product ID: ");
+        keywordsSearch = addLabelledTextField(searchInputPane, "Name keywords: ");
+        startYearSearch = addLabelledTextField(searchInputPane, "Start year: ");
+        endYearSearch = addLabelledTextField(searchInputPane, "End year: ");
 
-        return inputPane;
+        return searchInputPane;
     }
 
     private void resetSearch() {
@@ -149,18 +278,18 @@ public class EStoreSearchGUI implements ActionListener {
     }
 
     private JPanel createSearchButtonPane() {
-        JPanel buttonPane = new JPanel();
-        styleBoxLayoutPanel(buttonPane);
+        JPanel searchButtonPane = new JPanel();
+        styleBoxLayoutPanel(searchButtonPane);
 
         resetSearchButton = new JButton("Reset");
         resetSearchButton.addActionListener(e -> resetSearch());
-        buttonPane.add(resetSearchButton);
+        searchButtonPane.add(resetSearchButton);
 
         searchButton = new JButton("Search");
         searchButton.addActionListener(e -> performSearch());
-        buttonPane.add(searchButton);
+        searchButtonPane.add(searchButton);
 
-        return buttonPane;
+        return searchButtonPane;
     }
 
     private JPanel createSearchCard() {

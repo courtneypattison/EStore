@@ -34,3 +34,11 @@ price = ""
 year = "2013"
 maker = ""
 
+type = "book"
+productID = "999999"
+name = "new"
+price = "1999.0"
+year = "1999"
+authors = ""
+publisher = ""
+

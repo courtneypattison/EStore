@@ -18,7 +18,7 @@ public class EStoreSearch {
 
     private ArrayList<Product> products;
     private HashMap<String, HashSet<Integer>> keywords;
-    
+
     public static final String TOO_MANY_NUMBERS = "Invalid input: enter one number.";
     public static final String OUT_OF_RANGE = "Invalid input: out of range";
     public static final String NOT_AN_INTEGER = "Invalid input: enter an integer";
@@ -56,35 +56,6 @@ public class EStoreSearch {
     }
 
     /**
-     * Sets product id, name, year, and price if applicable
-     *
-     * @param product
-     * @param productName
-     *//*
-    private void populateProduct(Product product, String productName) throws InvalidInputException {
-        try {
-            Product productDuplicateId;
-
-            do {
-                promptUserSetField("Enter " + productName + " id:", (String userString) -> product.setId(userString));
-
-                productDuplicateId = checkIfIdExists(product);
-                if (productDuplicateId != null) {
-                    System.out.println("ID already exists!");
-                }
-            } while (productDuplicateId != null);
-
-            promptUserSetField("Enter " + productName + " name:", (String userString) -> product.setName(userString));
-            promptUserSetField("Enter " + productName + " year:",
-                    (String userString) -> product.setYear(parseUserInt(userString, Product.MIN_YEAR, Product.MAX_YEAR)));
-            promptUserSetField("Enter " + productName + " price:", (String userString) -> product.setPrice(parsePrice(userString)));
-        } catch (InvalidInputException e) {
-            throw new InvalidInputException(e.getMessage());
-        }
-
-    }
-
-    /**
      * Adds keywords from names in products to hash map
      *
      * @param product to add keywords from
@@ -106,56 +77,71 @@ public class EStoreSearch {
 
     /**
      * Adds book to books list
-     *//*
-    private void addBook() {
+     * @param id
+     * @param name
+     * @param year
+     * @param price
+     * @param author
+     * @param publisher
+     * @throws estoresearch.InvalidInputException
+     */
+    public void addBook(String id, String name, String yearString,
+            String priceString, String author, String publisher)
+            throws InvalidInputException {
+        
         Book book;
 
         try {
-            book = new Book();
-            populateProduct(book, "book");
+            int year = parseUserInt(yearString, Product.MIN_YEAR, Product.MAX_YEAR);
+            double price = parsePrice(priceString);
+            book = new Book(id, name, year, price, author, publisher);
         } catch (InvalidInputException e) {
-            System.out.println(e.getMessage());
-            return;
+            throw new InvalidInputException(e.getMessage());
         }
 
-        try {
-            promptUserSetField("Enter book author:", (String userString) -> book.setAuthor(userString));
-            promptUserSetField("Enter book publisher:", (String userString) -> book.setPublisher(userString));
-        } catch (InvalidInputException e) {
-            System.out.println(e.getMessage());
-            return;
+        Product productDuplicateId = checkIfIdExists(book);
+        if (productDuplicateId != null) {
+            throw new InvalidInputException("ID already exists!");
         }
 
         boolean add = products.add(book);
         assert (add);
         addKeywordsToHashMap(book);
-
     }
-
+    
     /**
-     * Adds electronic to electronics list
-     *//*
-    private void addElectronic() {
+     * Adds electronic to products list
+     * @param id
+     * @param name
+     * @param year
+     * @param price
+     * @param author
+     * @param publisher
+     * @throws estoresearch.InvalidInputException
+     */
+    public void addElectronic(String id, String name, String yearString,
+            String priceString, String maker)
+            throws InvalidInputException {
+        
         Electronic electronic;
 
         try {
-            electronic = new Electronic();
-            populateProduct(electronic, "electronic");
+            int year = parseUserInt(yearString, Product.MIN_YEAR, Product.MAX_YEAR);
+            double price = parsePrice(priceString);
+            electronic = new Electronic(id, name, year, price, maker);
         } catch (InvalidInputException e) {
-            System.out.println(e.getMessage());
-            return;
+            throw new InvalidInputException(e.getMessage());
         }
 
-        try {
-            promptUserSetField("Enter electronic maker:", (String userString) -> electronic.setMaker(userString));
-        } catch (InvalidInputException e) {
-            System.out.println(e.getMessage());
-            return;
+        Product productDuplicateId = checkIfIdExists(electronic);
+        if (productDuplicateId != null) {
+            throw new InvalidInputException("ID already exists!");
         }
 
         boolean add = products.add(electronic);
         assert (add);
         addKeywordsToHashMap(electronic);
+
     }
 
     /**
@@ -223,9 +209,9 @@ public class EStoreSearch {
      */
     private HashSet<Product> findMatchingIDProduct(String productID)
             throws InvalidInputException {
-        
+
         HashSet<Product> matchingProducts = new HashSet<>();
-        
+
         Product product = new Product();
 
         if (productID.equals("")) {
@@ -253,7 +239,7 @@ public class EStoreSearch {
      */
     private HashSet<Product> findMatchingKeywordProducts(String keywordSearch) {
         HashSet<Product> matchingProducts = new HashSet<>();
-        
+
         String[] searchTokens = keywordSearch.split("\\s+");
         ArrayList<HashSet<Integer>> matches = new ArrayList<>();
         HashSet<Integer> ints = new HashSet<>();
