@@ -6,7 +6,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- *
+ *  GUI for EStoreSearch
+ * 
  * @author Courtney Bodi
  */
 public class EStoreSearchGUI implements ActionListener, ItemListener {
@@ -39,6 +40,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     
     private String productType = BOOK;
 
+    /**
+     * Switches between cards
+     * 
+     * @param e event from card listener
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         String menuItemName = (String) e.getActionCommand();
@@ -52,12 +58,23 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         cardLayout.show(cards, menuItemName);
     }
 
+    /**
+     * Add menu item to menu
+     * 
+     * @param menu to be added to
+     * @param text to add the to menu item
+     */
     private void addMenuItem(JMenu menu, String text) {
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(this);
         menu.add(menuItem);
     }
 
+    /**
+     * Add menu to window
+     * 
+     * @param frame window to add menu to
+     */
     private void addMenu(JFrame frame) {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Commands");
@@ -70,17 +87,32 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         frame.setJMenuBar(menuBar);
     }
 
+    /**
+     * Style card orange, with a border, and using BorderLayout
+     * 
+     * @param card panel to be styled
+     */
     private void styleCard(JPanel card) {
         card.setBackground(Color.ORANGE);
         card.setBorder(new EmptyBorder(BORDER_SIZE));
         card.setLayout(new BorderLayout());
     }
 
+    /**
+     * Set panel as orange and using BoxLayout
+     * 
+     * @param pane to be styled
+     */
     private void styleBoxLayoutPanel(JPanel pane) {
         pane.setBackground(Color.ORANGE);
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
     }
 
+    /**
+     * Create a card that welcomes the user to the EStore
+     * 
+     * @return welcome card
+     */
     private JPanel createWelcomeCard() {
         JPanel welcomeCard = new JPanel();
         styleCard(welcomeCard);
@@ -94,6 +126,13 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return welcomeCard;
     }
 
+    /**
+     * Add text field with label to a panel
+     * 
+     * @param pane to be added to
+     * @param text to label the text field with
+     * @return a panel containing a label and text field
+     */
     private JTextField addLabelledTextField(JPanel pane, String text) {
         JPanel panel = new JPanel();
         panel.setBackground(Color.ORANGE);
@@ -111,6 +150,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return textField;
     }
     
+    /**
+     * Makes Book or Electronic fields visible or not depending of combo box
+     * 
+     * @param e event when combo box item toggled
+     */
     @Override
     public void itemStateChanged(ItemEvent e) { 
         String comboBoxItemName = (String) e.getItem();
@@ -128,6 +172,12 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         }
     }
     
+    /**
+     * Create a panel with combo box, labels, text fields, and buttons used to
+     * add products to ArrayList of products
+     * 
+     * @return panel 
+     */
     private JPanel createAddInputPane() {
         JPanel addInputPane = new JPanel();
         styleBoxLayoutPanel(addInputPane);
@@ -191,6 +241,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return addInputPane;
     }
     
+    /**
+     * Reset the text fields for adding products
+     */
     private void resetAdd() {
         productID.setText("");
         name.setText("");
@@ -201,6 +254,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         maker.setText("");
     }
     
+    /**
+     * Add product to EStoreSearch
+     */
     private void addProduct() {
         if (productType.equals(BOOK)) {
             try {
@@ -222,6 +278,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         }
     }
     
+    /**
+     * Create a panel of buttons used for adding products
+     * 
+     * @return panel of buttons used for adding products
+     */
     private JPanel createAddButtonPane() {
         JPanel addButtonPane = new JPanel();
         styleBoxLayoutPanel(addButtonPane);
@@ -237,6 +298,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return addButtonPane;
     }
 
+    /**
+     * Create a card used for adding products
+     * 
+     * @return a card used for adding products
+     */
     private JPanel createAddCard() {
         JPanel addCard = new JPanel();
         styleCard(addCard);
@@ -247,6 +313,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return addCard;
     }
 
+    /**
+     * Create a panel used for inputing search terms
+     * 
+     * @return a panel used for inputing search terms
+     */
     private JPanel createSearchInputPane() {
         JPanel searchInputPane = new JPanel();
         styleBoxLayoutPanel(searchInputPane);
@@ -259,6 +330,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return searchInputPane;
     }
 
+    /**
+     * Remove text from search fields
+     */
     private void resetSearch() {
         productIDSearch.setText("");
         keywordsSearch.setText("");
@@ -266,6 +340,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         endYearSearch.setText("");
     }
 
+    /**
+     * Perform search using user inputted search terms
+     */
     private void performSearch() {
         try {
             String matchingProducts = eStoreSearch.executeSearch(
@@ -277,6 +354,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         }
     }
 
+    /**
+     * Create panel filled with buttons used for searching
+     * 
+     * @return panel filled with buttons used for searching
+     */
     private JPanel createSearchButtonPane() {
         JPanel searchButtonPane = new JPanel();
         styleBoxLayoutPanel(searchButtonPane);
@@ -292,6 +374,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return searchButtonPane;
     }
 
+    /**
+     * Create card used for searching
+     * 
+     * @return card used for searching
+     */
     private JPanel createSearchCard() {
         JPanel searchCard = new JPanel();
         styleCard(searchCard);
@@ -302,6 +389,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         return searchCard;
     }
 
+    /**
+     * Add cards to window
+     * 
+     * @param frame main window
+     */
     private void addCards(JFrame frame) {
         cards = new JPanel(new CardLayout());
         cards.add(createWelcomeCard());
@@ -311,6 +403,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         frame.add(cards, BorderLayout.CENTER);
     }
 
+    /**
+     * Add a scroll pane used for program output
+     * 
+     * @param frame main window
+     */
     private void addScrollPane(JFrame frame) {
         memoDisplay = new JTextArea(LINES, CHARS_PER_LINE);
         memoDisplay.setEditable(false);
@@ -320,6 +417,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         frame.add(scrollPane, BorderLayout.PAGE_END);
     }
 
+    /**
+     * Create window and show it
+     */
     private void createAndShowGUI() {
         JFrame frame = new JFrame("Car Store");
         frame.setSize(WIDTH, HEIGHT);
@@ -339,6 +439,11 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         frame.setVisible(true);
     }
 
+    /**
+     * Check for command line arguments and start the GUI
+     * 
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         if (args.length == 1) {
             EStoreSearchGUI gui = new EStoreSearchGUI();

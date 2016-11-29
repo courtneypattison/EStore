@@ -328,7 +328,7 @@ public class EStoreSearchCLI {
         int numTries = 0;
         boolean exceptionFlag;
 
-        Product product = new Product();
+        Product product = new Book();
 
         do {
             exceptionFlag = false;

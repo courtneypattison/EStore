@@ -26,7 +26,6 @@ public class EStoreSearch {
     /**
      * Generic EStoreSearch constructor
      *
-     * @param products including books and electronics
      */
     public EStoreSearch() {
         products = new ArrayList<>();
@@ -77,13 +76,15 @@ public class EStoreSearch {
 
     /**
      * Adds book to books list
-     * @param id
-     * @param name
-     * @param year
-     * @param price
-     * @param author
-     * @param publisher
-     * @throws estoresearch.InvalidInputException
+     * 
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param yearString product released
+     * @param priceString of product in dollars CAD
+     * @param author of product with first and last name
+     * @param publisher of product name
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public void addBook(String id, String name, String yearString,
             String priceString, String author, String publisher)
@@ -111,13 +112,14 @@ public class EStoreSearch {
     
     /**
      * Adds electronic to products list
-     * @param id
-     * @param name
-     * @param year
-     * @param price
-     * @param author
-     * @param publisher
-     * @throws estoresearch.InvalidInputException
+     * 
+     * @param id is a unique 6 digit string
+     * @param name of product
+     * @param yearString product released
+     * @param priceString of product in dollars CAD
+     * @param maker of product string
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public void addElectronic(String id, String name, String yearString,
             String priceString, String maker)
@@ -212,15 +214,15 @@ public class EStoreSearch {
 
         HashSet<Product> matchingProducts = new HashSet<>();
 
-        Product product = new Product();
+        Book book = new Book();
 
         if (productID.equals("")) {
             return null;
         } else {
             try {
-                product.setId(productID);
+                book.setId(productID);
 
-                Product matchingProduct = checkIfIdExists(product);
+                Product matchingProduct = checkIfIdExists(book);
                 if (matchingProduct != null) {
                     matchingProducts.add(matchingProduct);
                 }
@@ -331,11 +333,11 @@ public class EStoreSearch {
         String matchingProductsString = "";
 
         if (matchingProducts.isEmpty()) {
-            return "None of the products match your search criteria.\n";
+            return "No matches.\n";
         } else if (matchingProducts.size() == 1) {
-            matchingProductsString += "The following product matches your search criteria:\n";
+            matchingProductsString += "Matches:\n";
         } else {
-            matchingProductsString += "The following products match your search criteria:\n";
+            matchingProductsString += "Matches:\n";
         }
         for (Product finalProduct : matchingProducts) {
             matchingProductsString += finalProduct.toString();
@@ -346,6 +348,14 @@ public class EStoreSearch {
 
     /**
      * Performs search
+     * 
+     * @param productID user input
+     * @param keywords user input
+     * @param startYear user input
+     * @param endYear user input
+     * @return string of matching products
+     * @throws estoresearch.InvalidInputException custom input validation
+     * checked exception
      */
     public String executeSearch(String productID, String keywords,
             String startYear, String endYear)

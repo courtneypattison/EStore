@@ -5,7 +5,7 @@ package estoresearch;
  *
  * @author Courtney Bodi
  */
-public class Product {
+public abstract class Product {
 
     public static final String INVALID_ID = "Invalid input: the ID must be a six digit long number.";
     public static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
@@ -259,105 +259,5 @@ public class Product {
                     + "price = \"" + price + "\"" + System.lineSeparator()
                     + "year = \"" + year + "\"" + System.lineSeparator();
         }
-    }
-
-    /**
-     * Main method for testing Product
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        boolean pass = true;
-
-        Product product1 = null, product2 = null, product3 = null, product4 = null;
-
-        System.out.println("Product Class Testing" + System.lineSeparator()
-                + "Prints true when test is passed, false otherwise" + System.lineSeparator());
-
-        try {
-            product1 = new Product();
-        } catch (InvalidInputException e) {
-            pass = false;
-        } finally {
-            System.out.println(pass + "\tnew Product()");
-        }
-
-        try {
-            product2 = new Product("000025", "Absolute Java", 2015);
-        } catch (InvalidInputException e) {
-            pass = false;
-        } finally {
-            System.out.println(pass + "\tnew Product(\"000025\", \"Absolute Java\", 2015)");
-        }
-
-        try {
-            product3 = new Product("000026", "Absolute Java", 2015, 199.95);
-        } catch (InvalidInputException e) {
-            product3 = null;
-            pass = false;
-        } finally {
-            System.out.println(pass + "\tnew Product(\"000026\", \"Absolute Java\", 2015, 199.95)");
-        }
-
-        try {
-            product4 = new Product("5", "Absolute Java", 2015, 199.95);
-        } catch (InvalidInputException e) {
-            pass = true;
-        } finally {
-            System.out.println(pass + "\tnew Product(\"5\", \"Absolute Java\", 2015, 199.95)");
-        }
-
-        String id = product3.getId();
-        pass = id.equals(product3.id);
-        System.out.println(pass + "\tgetId(product3)");
-
-        String name = product3.getName();
-        pass = name.equals(product3.name);
-        System.out.println(pass + "\tgetName(product3)");
-
-        int year = product3.getYear();
-        pass = year == product3.year;
-        System.out.println(pass + "\tgetYear(product3)");
-
-        double price = product3.getPrice();
-        pass = price == product3.price;
-        System.out.println(pass + "\tgetPrice(product3)");
-
-        try {
-            product3.setId("3");
-        } catch (InvalidInputException e) {
-            pass = true;
-        } finally {
-            System.out.println(pass + "\tproduct3.setId(\"3\")");
-        }
-
-        try {
-            product3.setName("");
-        } catch (InvalidInputException e) {
-            pass = true;
-        } finally {
-            System.out.println(pass + "\tproduct3.setName(\"\")");
-        }
-
-        try {
-            product3.setYear(3);
-        } catch (InvalidInputException e) {
-            pass = true;
-        } finally {
-            System.out.println(pass + "\tproduct3.setYear(3)");
-        }
-
-        try {
-            product3.setPrice(NO_PRICE);
-        } catch (InvalidInputException e) {
-            pass = true;
-        } finally {
-            System.out.println(pass + "\tproduct3.setPrice(NO_PRICE);");
-        }
-
-        pass = !product1.equals(product2);
-        System.out.println(pass + "\t!product3.equals(product1)");
-
-        System.out.println(product1.toString());
     }
 }
