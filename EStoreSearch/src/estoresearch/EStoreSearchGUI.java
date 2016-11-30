@@ -260,7 +260,7 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         if (productType.equals(BOOK)) {
             try {
                 eStoreSearch.addBook(productID.getText(), name.getText(),
-                        price.getText(), year.getText(), authors.getText(),
+                        year.getText(), price.getText(), authors.getText(),
                         publisher.getText());
                 messagesDisplay.setText("Successfully added book!");
             } catch (InvalidInputException e) {
@@ -269,7 +269,7 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         } else {
             try {
                 eStoreSearch.addElectronic(productID.getText(), name.getText(),
-                        price.getText(), year.getText(), maker.getText());
+                        year.getText(), price.getText(), maker.getText());
                 messagesDisplay.setText("Successfully added electronic!");
             } catch (InvalidInputException e) {
                 messagesDisplay.setText(e.getMessage());

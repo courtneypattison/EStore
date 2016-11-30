@@ -174,7 +174,7 @@ public class EStoreSearch {
 
         int lastIndex = userTokens[0].length() - 1;
         int decimalIndex = userTokens[0].indexOf(".");
-        if (lastIndex - decimalIndex != DECIMAL_PLACE) {
+        if (decimalIndex != -1 && lastIndex - decimalIndex != DECIMAL_PLACE) {
             throw new InvalidInputException(INVALID_DECIMAL_PLACE);
         }
 

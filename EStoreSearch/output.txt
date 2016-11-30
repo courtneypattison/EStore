@@ -20,3 +20,18 @@ price = ""
 year = "1999"
 maker = ""
 
+type = "book"
+productID = "999999"
+name = "9"
+price = "9.0"
+year = "1999"
+authors = ""
+publisher = ""
+
+type = "electronics"
+productID = "888888"
+name = "8"
+price = "8.0"
+year = "1989"
+maker = "yo"
+
