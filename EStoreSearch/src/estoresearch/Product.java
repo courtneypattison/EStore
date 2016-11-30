@@ -7,10 +7,14 @@ package estoresearch;
  */
 public abstract class Product {
 
-    public static final String INVALID_ID = "Invalid input: the ID must be a six digit long number.";
-    public static final String INVALID_NAME = "Invalid input: the name must have at least one character.";
-    public static final String INVALID_YEAR = "Invalid input: the year must be between 1000 and 9999.";
-    public static final String INVALID_PRICE = "Invalid input: the price must be greater than or equal to 0.";
+    public static final String INVALID_ID = "Invalid input: the ID must be a"
+            + " six digit long number.";
+    public static final String INVALID_NAME = "Invalid input: the name must"
+            + " have at least one character.";
+    public static final String INVALID_YEAR = "Invalid input: the year must be"
+            + " between 1000 and 9999.";
+    public static final String INVALID_PRICE = "Invalid input: the price must"
+            + " be greater than or equal to 0.";
 
     public static final int NO_PRICE = -1;
 
@@ -33,7 +37,8 @@ public abstract class Product {
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public Product(String id, String name, int year, double price) throws InvalidInputException {
+    public Product(String id, String name, int year, double price) throws
+            InvalidInputException {
         if (validateId(id)) {
             this.id = id;
         } else {
@@ -68,7 +73,8 @@ public abstract class Product {
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public Product(String id, String name, int year) throws InvalidInputException {
+    public Product(String id, String name, int year) throws
+            InvalidInputException {
         this(id, name, year, 0.0);
     }
 
@@ -249,15 +255,15 @@ public abstract class Product {
     @Override
     public String toString() {
         if (price == NO_PRICE) {
-            return "productID = \"" + id + "\"" + System.lineSeparator()
-                    + "name = \"" + name + "\"" + System.lineSeparator()
-                    + "price = \"\"" + System.lineSeparator()
-                    + "year = \"" + year + "\"" + System.lineSeparator();
+            return "productID = \"" + id + "\"\n"
+                    + "name = \"" + name + "\"\n"
+                    + "price = \"\"\n"
+                    + "year = \"" + year + "\"\n";
         } else {
-            return "productID = \"" + id + "\"" + System.lineSeparator()
-                    + "name = \"" + name + "\"" + System.lineSeparator()
-                    + "price = \"" + price + "\"" + System.lineSeparator()
-                    + "year = \"" + year + "\"" + System.lineSeparator();
+            return "productID = \"" + id + "\"\n"
+                    + "name = \"" + name + "\"\n"
+                    + "price = \"" + price + "\"\n"
+                    + "year = \"" + year + "\"\n";
         }
     }
 }

@@ -19,12 +19,17 @@ public class EStoreSearch {
     private ArrayList<Product> products;
     private HashMap<String, HashSet<Integer>> keywords;
 
-    public static final String TOO_MANY_NUMBERS = "Invalid input: enter one number.";
+    public static final String TOO_MANY_NUMBERS = "Invalid input: enter one"
+            + " number.";
     public static final String OUT_OF_RANGE = "Invalid input: out of range";
-    public static final String NOT_AN_INTEGER = "Invalid input: enter an integer";
-    public static final String INVALID_DECIMAL_PLACE = "Invalid input: the price must only have 2 decimal places";
+    public static final String NOT_AN_INTEGER = "Invalid input: enter an"
+            + " integer";
+    public static final String INVALID_DECIMAL_PLACE = "Invalid input: the"
+            + " price must only have 2 decimal places";
+    public static final String INVALID_RANGE = "Invalid input: start year must"
+            + " be less than or equal to end year";
     public static final String DUPLICATE_ID = "ID already exists!";
-    
+
     public static final int DECIMAL_PLACE = 2;
 
     /**
@@ -46,16 +51,17 @@ public class EStoreSearch {
     /**
      * Checks if product ID already exists in EStore
      *
-     * @param product
-     * @return
+     * @param productID to check for
+     * @return whether or not product with that productID is already in the
+     * store
      */
-    private Product checkIfIdExists(Product product) {
-        for (Product existingProduct : getProducts()) {
-            if (product.getId().equals(existingProduct.getId())) {
-                return existingProduct;
+    private Boolean idExists(String productID) {
+        for (Product product : getProducts()) {
+            if (productID.equals(product.getId())) {
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     /**
@@ -83,30 +89,29 @@ public class EStoreSearch {
      *
      * @param id is a unique 6 digit string
      * @param name of product
-     * @param yearString product released
-     * @param priceString of product in dollars CAD
+     * @param yearStr product released
+     * @param priceStr of product in dollars CAD
      * @param author of product with first and last name
      * @param publisher of product name
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public void addBook(String id, String name, String yearString,
-            String priceString, String author, String publisher)
+    public void addBook(String id, String name, String yearStr,
+            String priceStr, String author, String publisher)
             throws InvalidInputException {
 
         Book book;
 
+        if (idExists(id)) {
+            throw new InvalidInputException(DUPLICATE_ID);
+        }
+
         try {
-            int year = parseUserInt(yearString, Product.MIN_YEAR, Product.MAX_YEAR);
-            double price = parsePrice(priceString);
+            int year = parseUserInt(yearStr, Product.MIN_YEAR, Product.MAX_YEAR);
+            double price = parsePrice(priceStr);
             book = new Book(id, name, year, price, author, publisher);
         } catch (InvalidInputException e) {
             throw new InvalidInputException(e.getMessage());
-        }
-
-        Product productDuplicateId = checkIfIdExists(book);
-        if (productDuplicateId != null) {
-            throw new InvalidInputException(DUPLICATE_ID);
         }
 
         boolean add = products.add(book);
@@ -119,29 +124,28 @@ public class EStoreSearch {
      *
      * @param id is a unique 6 digit string
      * @param name of product
-     * @param yearString product released
-     * @param priceString of product in dollars CAD
+     * @param yearStr product released
+     * @param priceStr of product in dollars CAD
      * @param maker of product string
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public void addElectronic(String id, String name, String yearString,
-            String priceString, String maker)
+    public void addElectronic(String id, String name, String yearStr,
+            String priceStr, String maker)
             throws InvalidInputException {
 
         Electronic electronic;
 
+        if (idExists(id)) {
+            throw new InvalidInputException(DUPLICATE_ID);
+        }
+
         try {
-            int year = parseUserInt(yearString, Product.MIN_YEAR, Product.MAX_YEAR);
-            double price = parsePrice(priceString);
+            int year = parseUserInt(yearStr, Product.MIN_YEAR, Product.MAX_YEAR);
+            double price = parsePrice(priceStr);
             electronic = new Electronic(id, name, year, price, maker);
         } catch (InvalidInputException e) {
             throw new InvalidInputException(e.getMessage());
-        }
-
-        Product productDuplicateId = checkIfIdExists(electronic);
-        if (productDuplicateId != null) {
-            throw new InvalidInputException(DUPLICATE_ID);
         }
 
         boolean add = products.add(electronic);
@@ -167,8 +171,10 @@ public class EStoreSearch {
         if (userString.equals("")) {
             return Product.NO_PRICE;
         }
-        
-        if (userTokens[0].length() - 1 - userTokens[0].indexOf(".") != DECIMAL_PLACE) {
+
+        int lastIndex = userTokens[0].length() - 1;
+        int decimalIndex = userTokens[0].indexOf(".");
+        if (lastIndex - decimalIndex != DECIMAL_PLACE) {
             throw new InvalidInputException(INVALID_DECIMAL_PLACE);
         }
 
@@ -206,7 +212,8 @@ public class EStoreSearch {
         }
 
         if (userInt < min || userInt > max) {
-            throw new InvalidInputException(OUT_OF_RANGE + " " + min + "-" + max);
+            throw new InvalidInputException(OUT_OF_RANGE + " " + min + "-"
+                    + max);
         }
 
         return userInt;
@@ -227,15 +234,11 @@ public class EStoreSearch {
         if (productID.equals("")) {
             return null;
         } else {
-            try {
-                book.setId(productID);
-
-                Product matchingProduct = checkIfIdExists(book);
-                if (matchingProduct != null) {
-                    matchingProducts.add(matchingProduct);
+            for (Product product : getProducts()) {
+                if (productID.equals(product.getId())) {
+                    matchingProducts.add(product);
+                    break;
                 }
-            } catch (InvalidInputException e) {
-                throw new InvalidInputException(e.getMessage());
             }
         }
         return matchingProducts;
@@ -284,8 +287,8 @@ public class EStoreSearch {
      *
      * @param matchingProducts
      */
-    private HashSet<Product> findMatchingTimePeriodProducts(String startYear, String endYear)
-            throws InvalidInputException {
+    private HashSet<Product> findMatchingTimePeriodProducts(String startYear,
+            String endYear) throws InvalidInputException {
         HashSet<Product> matchingProducts = new HashSet<>();
 
         try {
@@ -293,35 +296,41 @@ public class EStoreSearch {
                 return null;
             } else if (startYear.equals("")) {
                 for (Product product : getProducts()) {
-                    int end = parseUserInt(endYear, Product.MIN_YEAR, Product.MAX_YEAR);
+                    int end = parseUserInt(endYear, Product.MIN_YEAR,
+                            Product.MAX_YEAR);
+
                     if (product.getYear() <= end) {
                         matchingProducts.add(product);
                     }
                 }
             } else if (endYear.equals("")) {
-                int start = parseUserInt(startYear, Product.MIN_YEAR, Product.MAX_YEAR);
+                int start = parseUserInt(startYear, Product.MIN_YEAR,
+                        Product.MAX_YEAR);
+
                 for (Product product : getProducts()) {
                     if (product.getYear() >= start) {
                         matchingProducts.add(product);
                     }
                 }
             } else {
-                int end = parseUserInt(endYear, Product.MIN_YEAR, Product.MAX_YEAR);
-                int start = parseUserInt(startYear, Product.MIN_YEAR, Product.MAX_YEAR);
+                int end = parseUserInt(endYear, Product.MIN_YEAR,
+                        Product.MAX_YEAR);
+                int start = parseUserInt(startYear, Product.MIN_YEAR,
+                        Product.MAX_YEAR);
+
                 if (start == end) {
                     for (Product product : getProducts()) {
                         if (product.getYear() == start) {
                             matchingProducts.add(product);
-                            break;
                         }
                     }
                 } else if (start > end) {
-                    throw new InvalidInputException("Invalid input: start year must be less than or equal to end year");
+                    throw new InvalidInputException(INVALID_RANGE);
                 } else {
                     for (Product product : getProducts()) {
-                        if (product.getYear() >= start && product.getYear() <= end) {
+                        if (product.getYear() >= start
+                                && product.getYear() <= end) {
                             matchingProducts.add(product);
-                            break;
                         }
                     }
                 }
@@ -348,7 +357,7 @@ public class EStoreSearch {
             matchingProductsString += "Matches:\n";
         }
         for (Product finalProduct : matchingProducts) {
-            matchingProductsString += finalProduct.toString() + "\n";
+            matchingProductsString += finalProduct + "\n";
         }
 
         return matchingProductsString;
@@ -382,7 +391,8 @@ public class EStoreSearch {
         matchingProducts.add(findMatchingKeywordProducts(keywords));
 
         try {
-            matchingProducts.add(findMatchingTimePeriodProducts(startYear, endYear));
+            matchingProducts.add(findMatchingTimePeriodProducts(startYear,
+                    endYear));
         } catch (InvalidInputException e) {
             throw new InvalidInputException(e.getMessage());
         }
@@ -453,14 +463,15 @@ public class EStoreSearch {
      */
     public void loadProducts(String filename) {
         Scanner fileInput = null;
-        String type = "", productID = "", name = "", authors = "", publisher = "", maker = "";
+        String type = "", productID = "", name = "", authors = "",
+                publisher = "", maker = "";
         double price = Product.NO_PRICE;
         int year = 0;
 
         try {
             fileInput = new Scanner(new FileInputStream(filename));
         } catch (FileNotFoundException e) {
-            System.out.println(filename + " was not found or could not be opened.");
+            System.out.println(filename + " was not found or couldn't be opened.");
             System.exit(0);
         }
 
@@ -486,41 +497,35 @@ public class EStoreSearch {
                     publisher = value;
                 } else if (attribute.equals("maker")) {
                     maker = value;
-                } else if (attribute.equals("\n")) {
+                } else if (attribute.equals("\n") || !fileInput.hasNextLine()) {
+                    Product product;
+
+                    if (idExists(productID)) {
+                        throw new InvalidInputException(DUPLICATE_ID);
+                    } else if (type.equals("book")) {
+                        product = new Book(productID, name, year, price,
+                                authors, publisher);
+                        getProducts().add(product);
+                        addKeywordsToHashMap(product);
+                    } else if (type.equals("electronics")) {
+                        product = new Electronic(productID, name, year, price,
+                                maker);
+                        getProducts().add(product);
+                        addKeywordsToHashMap(product);
+                    }
+
+                    type = productID = name = authors = publisher = maker = "";
+                    price = Product.NO_PRICE;
+                    year = 0;
                 } else {
                     System.out.println("Invalid input from file");
                     System.exit(0);
                 }
-
-                if (attribute.equals("\n") || !fileInput.hasNextLine()) {
-                    if (type.equals("book")) {
-                        Book book = new Book(productID, name, year, price, authors, publisher);
-                        Product productDuplicateId = checkIfIdExists(book);
-                        if (productDuplicateId == null) {
-                            getProducts().add(book);
-                            addKeywordsToHashMap(book);
-                        } else {
-                            book = null;
-                            System.out.println(DUPLICATE_ID);
-                        }
-                    } else {
-                        Electronic electronic = new Electronic(productID, name, year, price, maker);
-                        Product productDuplicateId = checkIfIdExists(electronic);
-                        if (productDuplicateId == null) {
-                            getProducts().add(electronic);
-                            addKeywordsToHashMap(electronic);
-                        } else {
-                            electronic = null;
-                            System.out.println(DUPLICATE_ID);
-                        }
-                    }
-                    type = productID = name = authors = publisher = maker = "";
-                    price = Product.NO_PRICE;
-                    year = 0;
-
-                }
             } catch (InvalidInputException e) {
                 System.out.println(e.getMessage());
+                type = productID = name = authors = publisher = maker = "";
+                price = Product.NO_PRICE;
+                year = 0;
             }
         }
         fileInput.close();

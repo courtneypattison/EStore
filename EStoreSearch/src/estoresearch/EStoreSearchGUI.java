@@ -14,9 +14,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
 
     private final EStoreSearch eStoreSearch = new EStoreSearch();
 
-    private JPanel cards, authorsPane, publisherPane, makerPane;
+    private JPanel cards, authorsPane, publisherPane, makerPane, messages,
+            searchResults;
     private JTextArea messagesDisplay, searchResultsDisplay;
-    private JPanel messages, searchResults;
 
     private JTextField productID, name, price, year, authors, publisher, maker,
             productIDSearch, keywordsSearch, startYearSearch, endYearSearch;
@@ -470,13 +470,12 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        EStoreSearchGUI gui = new EStoreSearchGUI();
+        
         if (args.length == 1) {
-            EStoreSearchGUI gui = new EStoreSearchGUI();
             gui.eStoreSearch.loadProducts(args[0]);
-
-            javax.swing.SwingUtilities.invokeLater(() -> gui.createAndShowGUI());
-        } else {
-            System.out.println("You must enter a filename when running this program.");
         }
+        
+        javax.swing.SwingUtilities.invokeLater(() -> gui.createAndShowGUI());
     }
 }

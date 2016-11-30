@@ -7,7 +7,8 @@ package estoresearch;
  */
 public class Electronic extends Product {
 
-    public static final String INVALID_MAKER = "Invalid input: the maker must have at least one character.";
+    public static final String INVALID_MAKER = "Invalid input: the maker must"
+            + " have at least one character.";
 
     private String maker;
 
@@ -22,7 +23,8 @@ public class Electronic extends Product {
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public Electronic(String id, String name, int year, double price, String maker) throws InvalidInputException {
+    public Electronic(String id, String name, int year, double price,
+            String maker) throws InvalidInputException {
         super(id, name, year, price);
         if (maker != null) {
             this.maker = maker;
@@ -40,7 +42,8 @@ public class Electronic extends Product {
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public Electronic(String id, String name, int year) throws InvalidInputException {
+    public Electronic(String id, String name, int year) throws
+            InvalidInputException {
         super(id, name, year);
     }
 
@@ -55,8 +58,16 @@ public class Electronic extends Product {
         maker = "";
     }
 
+    /**
+     * Copy constructor
+     * 
+     * @param electronic that has been initialized
+     * @throws InvalidInputException custom input validation
+     * checked exception
+     */
     public Electronic(Electronic electronic) throws InvalidInputException {
-        this(electronic.getId(), electronic.getName(), electronic.getYear(), electronic.getPrice(), electronic.getMaker());
+        this(electronic.getId(), electronic.getName(), electronic.getYear(),
+                electronic.getPrice(), electronic.getMaker());
     }
 
     /**
@@ -106,9 +117,9 @@ public class Electronic extends Product {
      */
     @Override
     public String toString() {
-        return "type = \"electronics\"" + System.lineSeparator()
+        return "type = \"electronics\"\n"
                 + super.toString()
-                + "maker = \"" + maker + "\"" + System.lineSeparator();
+                + "maker = \"" + maker + "\"\n";
     }
 
     /**
@@ -120,15 +131,16 @@ public class Electronic extends Product {
         Electronic elec1 = null, elec2 = null;
         boolean pass = true;
 
-        System.out.println("Electronic Class Testing" + System.lineSeparator()
-                + "Prints true when test is passed, false otherwise" + System.lineSeparator());
+        System.out.println("Electronic Class Testing\n"
+                + "Prints true when test is passed, false otherwise\n");
 
         try {
             elec1 = new Electronic("000000", "foo", 1990, 200.00, "hello");
         } catch (InvalidInputException e) {
             pass = false;
         } finally {
-            System.out.println(pass + "\tnew Electronic(\"000000\", \"foo\", 1990, 200.00, \"hello\")");
+            System.out.println(pass + "\tnew Electronic(\"000000\", \"foo\","
+                    + " 1990, 200.00, \"hello\")");
         }
 
         try {
@@ -136,7 +148,8 @@ public class Electronic extends Product {
         } catch (InvalidInputException e) {
             pass = false;
         } finally {
-            System.out.println(pass + "\tnew Electronic(\"000001\", \"foo\", 1990)");
+            System.out.println(pass + "\tnew Electronic(\"000001\", \"foo\","
+                    + " 1990)");
         }
 
         try {

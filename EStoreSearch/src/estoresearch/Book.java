@@ -7,8 +7,10 @@ package estoresearch;
  */
 public class Book extends Product {
 
-    public static final String INVALID_AUTHOR = "Invalid input: the author must have at least one character.";
-    public static final String INVALID_PUBLISHER = "Invalid input: the publisher must have at least one character.";
+    public static final String INVALID_AUTHOR = "Invalid input: the author must"
+            + " have at least one character.";
+    public static final String INVALID_PUBLISHER = "Invalid input: the"
+            + " publisher must have at least one character.";
 
     private String author, publisher;
 
@@ -24,7 +26,8 @@ public class Book extends Product {
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public Book(String id, String name, int year, double price, String author, String publisher) throws InvalidInputException {
+    public Book(String id, String name, int year, double price, String author,
+           String publisher) throws InvalidInputException {
         super(id, name, year, price);
 
         if (author != null) {
@@ -53,13 +56,25 @@ public class Book extends Product {
         super(id, name, year);
     }
 
+    /**
+     * Default constructor
+     * 
+     * @throws InvalidInputException custom input validation checked exception
+     */
     public Book() throws InvalidInputException {
         super();
         author = publisher = "";
     }
 
+    /**
+     * Copy constructor
+     * 
+     * @param book that has been initialized
+     * @throws InvalidInputException custom input validation checked exception
+     */
     public Book(Book book) throws InvalidInputException {
-        this(book.getId(), book.getName(), book.getYear(), book.getPrice(), book.getAuthor(), book.getPublisher());
+        this(book.getId(), book.getName(), book.getYear(), book.getPrice(), 
+             book.getAuthor(), book.getPublisher());
     }
 
     /**
@@ -133,10 +148,10 @@ public class Book extends Product {
      */
     @Override
     public String toString() {
-        return "type = \"book\"" + System.lineSeparator()
+        return "type = \"book\"\n"
                 + super.toString()
-                + "authors = \"" + author + "\"" + System.lineSeparator()
-                + "publisher = \"" + publisher + "\"" + System.lineSeparator();
+                + "authors = \"" + author + "\"\n"
+                + "publisher = \"" + publisher + "\"\n";
     }
 
     /**
@@ -148,8 +163,8 @@ public class Book extends Product {
         Book book1 = null, book2 = null, book3 = null;
         boolean pass = true;
 
-        System.out.println("Book Class Testing" + System.lineSeparator()
-                + "Prints true when test is passed, false otherwise" + System.lineSeparator());
+        System.out.println("Book Class Testing\n"
+                + "Prints true when test is passed, false otherwise\n");
 
         try {
             Book book0 = new Book();
@@ -162,7 +177,8 @@ public class Book extends Product {
         } catch (InvalidInputException e) {
             pass = false;
         } finally {
-            System.out.println(pass + "\tnew Book(\"000000\", \"foo\", 1990, 200.00, \"hello\")");
+            System.out.println(pass + "\tnew Book(\"000000\", \"foo\", 1990, "
+                               + "200.00, \"hello\")");
         }
 
         try {
