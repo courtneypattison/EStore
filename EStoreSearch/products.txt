@@ -9,7 +9,7 @@ publisher = "Pearson"
 type = "electronics"
 productID = "222222"
 name = "MacBook Air 11\" Intel Dual-Core i5 1.6GHz"
-price = "1099.99"
+price = "1099.999"
 year = "2013"
 maker = ""
 

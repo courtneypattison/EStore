@@ -437,6 +437,7 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         addScrollPane(frame);
 
         frame.setVisible(true);
+        memoDisplay.setVisible(false);
     }
 
     /**

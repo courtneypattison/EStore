@@ -22,6 +22,10 @@ public class EStoreSearch {
     public static final String TOO_MANY_NUMBERS = "Invalid input: enter one number.";
     public static final String OUT_OF_RANGE = "Invalid input: out of range";
     public static final String NOT_AN_INTEGER = "Invalid input: enter an integer";
+    public static final String INVALID_DECIMAL_PLACE = "Invalid input: the price must only have 2 decimal places";
+    public static final String DUPLICATE_ID = "ID already exists!";
+    
+    public static final int DECIMAL_PLACE = 2;
 
     /**
      * Generic EStoreSearch constructor
@@ -76,7 +80,7 @@ public class EStoreSearch {
 
     /**
      * Adds book to books list
-     * 
+     *
      * @param id is a unique 6 digit string
      * @param name of product
      * @param yearString product released
@@ -89,7 +93,7 @@ public class EStoreSearch {
     public void addBook(String id, String name, String yearString,
             String priceString, String author, String publisher)
             throws InvalidInputException {
-        
+
         Book book;
 
         try {
@@ -102,17 +106,17 @@ public class EStoreSearch {
 
         Product productDuplicateId = checkIfIdExists(book);
         if (productDuplicateId != null) {
-            throw new InvalidInputException("ID already exists!");
+            throw new InvalidInputException(DUPLICATE_ID);
         }
 
         boolean add = products.add(book);
         assert (add);
         addKeywordsToHashMap(book);
     }
-    
+
     /**
      * Adds electronic to products list
-     * 
+     *
      * @param id is a unique 6 digit string
      * @param name of product
      * @param yearString product released
@@ -124,7 +128,7 @@ public class EStoreSearch {
     public void addElectronic(String id, String name, String yearString,
             String priceString, String maker)
             throws InvalidInputException {
-        
+
         Electronic electronic;
 
         try {
@@ -137,7 +141,7 @@ public class EStoreSearch {
 
         Product productDuplicateId = checkIfIdExists(electronic);
         if (productDuplicateId != null) {
-            throw new InvalidInputException("ID already exists!");
+            throw new InvalidInputException(DUPLICATE_ID);
         }
 
         boolean add = products.add(electronic);
@@ -162,6 +166,10 @@ public class EStoreSearch {
 
         if (userString.equals("")) {
             return Product.NO_PRICE;
+        }
+        
+        if (userTokens[0].length() - 1 - userTokens[0].indexOf(".") != DECIMAL_PLACE) {
+            throw new InvalidInputException(INVALID_DECIMAL_PLACE);
         }
 
         try {
@@ -340,7 +348,7 @@ public class EStoreSearch {
             matchingProductsString += "Matches:\n";
         }
         for (Product finalProduct : matchingProducts) {
-            matchingProductsString += finalProduct.toString();
+            matchingProductsString += finalProduct.toString() + "\n";
         }
 
         return matchingProductsString;
@@ -348,7 +356,7 @@ public class EStoreSearch {
 
     /**
      * Performs search
-     * 
+     *
      * @param productID user input
      * @param keywords user input
      * @param startYear user input
@@ -360,7 +368,6 @@ public class EStoreSearch {
     public String executeSearch(String productID, String keywords,
             String startYear, String endYear)
             throws InvalidInputException {
-        Boolean matchingProductFlag = false;
 
         HashSet<Product> productsCopy = new HashSet<>(getProducts());
 
@@ -383,12 +390,7 @@ public class EStoreSearch {
         for (HashSet<Product> matchingProduct : matchingProducts) {
             if (matchingProduct != null) {
                 productsCopy.retainAll(matchingProduct);
-                matchingProductFlag = true;
             }
-        }
-
-        if (!matchingProductFlag) {
-            productsCopy.clear();
         }
 
         return matchingProductsToString(productsCopy);
@@ -493,12 +495,24 @@ public class EStoreSearch {
                 if (attribute.equals("\n") || !fileInput.hasNextLine()) {
                     if (type.equals("book")) {
                         Book book = new Book(productID, name, year, price, authors, publisher);
-                        getProducts().add(book);
-                        addKeywordsToHashMap(book);
+                        Product productDuplicateId = checkIfIdExists(book);
+                        if (productDuplicateId == null) {
+                            getProducts().add(book);
+                            addKeywordsToHashMap(book);
+                        } else {
+                            book = null;
+                            System.out.println(DUPLICATE_ID);
+                        }
                     } else {
                         Electronic electronic = new Electronic(productID, name, year, price, maker);
-                        getProducts().add(electronic);
-                        addKeywordsToHashMap(electronic);
+                        Product productDuplicateId = checkIfIdExists(electronic);
+                        if (productDuplicateId == null) {
+                            getProducts().add(electronic);
+                            addKeywordsToHashMap(electronic);
+                        } else {
+                            electronic = null;
+                            System.out.println(DUPLICATE_ID);
+                        }
                     }
                     type = productID = name = authors = publisher = maker = "";
                     price = Product.NO_PRICE;
