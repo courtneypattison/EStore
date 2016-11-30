@@ -15,21 +15,20 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     private final EStoreSearch eStoreSearch = new EStoreSearch();
 
     private JPanel cards, authorsPane, publisherPane, makerPane;
-    private JTextArea memoDisplay;
+    private JTextArea messagesDisplay, searchResultsDisplay;
+    private JPanel messages, searchResults;
 
     private JTextField productID, name, price, year, authors, publisher, maker,
             productIDSearch, keywordsSearch, startYearSearch, endYearSearch;
 
     private JButton addButton, searchButton, resetAddButton, resetSearchButton;
     
-    public static final int WIDTH = 809;
-    public static final int HEIGHT = 500;
-
     public static final int LINES = 10;
     public static final int CHARS_PER_LINE = 20;
 
     public static final Insets BORDER_SIZE = new Insets(10, 10, 10, 10);
     public static final Dimension COMPONENT_SIZE = new Dimension(800, 30);
+    public static final Dimension WINDOW_SIZE = new Dimension(809, 500);
 
     public static final String ADD = "Add";
     public static final String SEARCH = "Search";
@@ -263,17 +262,17 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
                 eStoreSearch.addBook(productID.getText(), name.getText(),
                         price.getText(), year.getText(), authors.getText(),
                         publisher.getText());
-                memoDisplay.setText("Successfully added book!");
+                messagesDisplay.setText("Successfully added book!");
             } catch (InvalidInputException e) {
-                memoDisplay.setText(e.getMessage());
+                messagesDisplay.setText(e.getMessage());
             }
         } else {
             try {
                 eStoreSearch.addElectronic(productID.getText(), name.getText(),
                         price.getText(), year.getText(), maker.getText());
-                memoDisplay.setText("Successfully added electronic!");
+                messagesDisplay.setText("Successfully added electronic!");
             } catch (InvalidInputException e) {
-                memoDisplay.setText(e.getMessage());
+                messagesDisplay.setText(e.getMessage());
             }
         }
     }
@@ -297,6 +296,25 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
 
         return addButtonPane;
     }
+    
+    /**
+     * 
+     * 
+     * @param frame
+     */
+    private JPanel createMessagesPane() {
+        messages = new JPanel();
+        styleBoxLayoutPanel(messages);
+        
+        messagesDisplay = new JTextArea(LINES, CHARS_PER_LINE);
+        messagesDisplay.setEditable(false);
+
+        JScrollPane scrollPane = new JScrollPane(messagesDisplay);
+        messages.add(new JLabel("Messages"));
+        messages.add(scrollPane);
+
+        return messages;
+    }
 
     /**
      * Create a card used for adding products
@@ -306,9 +324,10 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     private JPanel createAddCard() {
         JPanel addCard = new JPanel();
         styleCard(addCard);
-        
+        addCard.add(new JLabel("Adding a product"), BorderLayout.PAGE_START);
         addCard.add(createAddInputPane(), BorderLayout.LINE_START);
         addCard.add(createAddButtonPane(), BorderLayout.LINE_END);
+        addCard.add(createMessagesPane(), BorderLayout.PAGE_END);
 
         return addCard;
     }
@@ -348,9 +367,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
             String matchingProducts = eStoreSearch.executeSearch(
                     productIDSearch.getText(), keywordsSearch.getText(),
                     startYearSearch.getText(), endYearSearch.getText());
-            memoDisplay.setText(matchingProducts);
+            searchResultsDisplay.setText(matchingProducts);
         } catch (InvalidInputException e) {
-            memoDisplay.setText(e.getMessage());
+            searchResultsDisplay.setText(e.getMessage());
         }
     }
 
@@ -373,6 +392,25 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
 
         return searchButtonPane;
     }
+    
+    /**
+     * 
+     * 
+     * @param frame
+     */
+    private JPanel createSearchResultsPane() {
+        searchResults = new JPanel();
+        styleBoxLayoutPanel(searchResults);
+        
+        searchResultsDisplay = new JTextArea(LINES, CHARS_PER_LINE);
+        searchResultsDisplay.setEditable(false);
+
+        JScrollPane scrollPane = new JScrollPane(searchResultsDisplay);
+        searchResults.add(new JLabel("Search results"));
+        searchResults.add(scrollPane);
+        
+        return searchResults;
+    }
 
     /**
      * Create card used for searching
@@ -385,6 +423,7 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
 
         searchCard.add(createSearchInputPane(), BorderLayout.LINE_START);
         searchCard.add(createSearchButtonPane(), BorderLayout.LINE_END);
+        searchCard.add(createSearchResultsPane(), BorderLayout.PAGE_END);
 
         return searchCard;
     }
@@ -404,25 +443,10 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     }
 
     /**
-     * Add a scroll pane used for program output
-     * 
-     * @param frame main window
-     */
-    private void addScrollPane(JFrame frame) {
-        memoDisplay = new JTextArea(LINES, CHARS_PER_LINE);
-        memoDisplay.setEditable(false);
-
-        JScrollPane scrollPane = new JScrollPane(memoDisplay);
-
-        frame.add(scrollPane, BorderLayout.PAGE_END);
-    }
-
-    /**
      * Create window and show it
      */
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Car Store");
-        frame.setSize(WIDTH, HEIGHT);
+        JFrame frame = new JFrame("eStore");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -434,10 +458,10 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
 
         addMenu(frame);
         addCards(frame);
-        addScrollPane(frame);
-
+        
+        frame.setMinimumSize(WINDOW_SIZE);
+        frame.pack();
         frame.setVisible(true);
-        memoDisplay.setVisible(false);
     }
 
     /**
