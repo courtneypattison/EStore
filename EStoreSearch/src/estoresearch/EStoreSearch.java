@@ -20,14 +20,13 @@ public class EStoreSearch {
     private HashMap<String, HashSet<Integer>> keywords;
 
     public static final String TOO_MANY_NUMBERS = "Invalid input: enter one"
-            + " number.";
-    public static final String OUT_OF_RANGE = "Invalid input: out of range";
+            + " number";
     public static final String NOT_AN_INTEGER = "Invalid input: enter an"
-            + " integer";
+            + " integer for the year";
+    public static final String INVALID_START_END = "Invalid input: start year"
+            + " must be less than or equal to end year";
     public static final String INVALID_DECIMAL_PLACE = "Invalid input: the"
             + " price must only have 2 decimal places";
-    public static final String INVALID_RANGE = "Invalid input: start year must"
-            + " be less than or equal to end year";
     public static final String DUPLICATE_ID = "ID already exists!";
 
     public static final int DECIMAL_PLACE = 2;
@@ -72,10 +71,12 @@ public class EStoreSearch {
     private void addKeywordsToHashMap(Product product) {
         String[] nameTokens = product.getName().toLowerCase().split("\\s+");
         for (String keyword : nameTokens) {
+            // Append if keyword already exists
             if (keywords.containsKey(keyword)) {
                 HashSet<Integer> ints = keywords.get(keyword);
                 ints.add(getProducts().indexOf(product));
                 keywords.put(keyword, ints);
+            // Create new hashset if keyword does not exist
             } else {
                 HashSet<Integer> ints = new HashSet<>();
                 ints.add(getProducts().indexOf(product));
@@ -89,15 +90,15 @@ public class EStoreSearch {
      *
      * @param id is a unique 6 digit string
      * @param name of product
-     * @param yearStr product released
-     * @param priceStr of product in dollars CAD
+     * @param year product released
+     * @param price of product in dollars CAD
      * @param author of product with first and last name
      * @param publisher of product name
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public void addBook(String id, String name, String yearStr,
-            String priceStr, String author, String publisher)
+    public void addBook(String id, String name, String year,
+            String price, String author, String publisher)
             throws InvalidInputException {
 
         Book book;
@@ -107,9 +108,8 @@ public class EStoreSearch {
         }
 
         try {
-            int year = parseUserInt(yearStr, Product.MIN_YEAR, Product.MAX_YEAR);
-            double price = parsePrice(priceStr);
-            book = new Book(id, name, year, price, author, publisher);
+            book = new Book(id, name, parseYear(year), parsePrice(price),
+                    author, publisher);
         } catch (InvalidInputException e) {
             throw new InvalidInputException(e.getMessage());
         }
@@ -124,16 +124,14 @@ public class EStoreSearch {
      *
      * @param id is a unique 6 digit string
      * @param name of product
-     * @param yearStr product released
-     * @param priceStr of product in dollars CAD
+     * @param year product released
+     * @param price of product in dollars CAD
      * @param maker of product string
      * @throws estoresearch.InvalidInputException custom input validation
      * checked exception
      */
-    public void addElectronic(String id, String name, String yearStr,
-            String priceStr, String maker)
-            throws InvalidInputException {
-
+    public void addElectronic(String id, String name, String year, String price,
+            String maker) throws InvalidInputException {
         Electronic electronic;
 
         if (idExists(id)) {
@@ -141,9 +139,8 @@ public class EStoreSearch {
         }
 
         try {
-            int year = parseUserInt(yearStr, Product.MIN_YEAR, Product.MAX_YEAR);
-            double price = parsePrice(priceStr);
-            electronic = new Electronic(id, name, year, price, maker);
+            electronic = new Electronic(id, name, parseYear(year),
+                    parsePrice(price), maker);
         } catch (InvalidInputException e) {
             throw new InvalidInputException(e.getMessage());
         }
@@ -172,6 +169,7 @@ public class EStoreSearch {
             return Product.NO_PRICE;
         }
 
+        // Check if more than 2 decimal places
         int lastIndex = userTokens[0].length() - 1;
         int decimalIndex = userTokens[0].indexOf(".");
         if (decimalIndex != -1 && lastIndex - decimalIndex != DECIMAL_PLACE) {
@@ -180,7 +178,7 @@ public class EStoreSearch {
 
         try {
             price = Double.parseDouble(userString);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             throw new InvalidInputException(Product.INVALID_PRICE);
         }
 
@@ -196,8 +194,7 @@ public class EStoreSearch {
      *
      * @return user entered integer between min and max, or throws an exception
      */
-    private int parseUserInt(String userString, int min, int max)
-            throws InvalidInputException {
+    private int parseYear(String userString) throws InvalidInputException {
         int userInt = 0;
 
         String[] userTokens = userString.split("\\s+");
@@ -211,9 +208,8 @@ public class EStoreSearch {
             throw new InvalidInputException(NOT_AN_INTEGER);
         }
 
-        if (userInt < min || userInt > max) {
-            throw new InvalidInputException(OUT_OF_RANGE + " " + min + "-"
-                    + max);
+        if (userInt < Product.MIN_YEAR || userInt > Product.MAX_YEAR) {
+            throw new InvalidInputException(Product.INVALID_YEAR);
         }
 
         return userInt;
@@ -237,6 +233,7 @@ public class EStoreSearch {
             for (Product product : getProducts()) {
                 if (productID.equals(product.getId())) {
                     matchingProducts.add(product);
+                    // Stop searching when found
                     break;
                 }
             }
@@ -296,27 +293,19 @@ public class EStoreSearch {
                 return null;
             } else if (startYear.equals("")) {
                 for (Product product : getProducts()) {
-                    int end = parseUserInt(endYear, Product.MIN_YEAR,
-                            Product.MAX_YEAR);
-
-                    if (product.getYear() <= end) {
+                    if (product.getYear() <= parseYear(endYear)) {
                         matchingProducts.add(product);
                     }
                 }
             } else if (endYear.equals("")) {
-                int start = parseUserInt(startYear, Product.MIN_YEAR,
-                        Product.MAX_YEAR);
-
                 for (Product product : getProducts()) {
-                    if (product.getYear() >= start) {
+                    if (product.getYear() >= parseYear(startYear)) {
                         matchingProducts.add(product);
                     }
                 }
             } else {
-                int end = parseUserInt(endYear, Product.MIN_YEAR,
-                        Product.MAX_YEAR);
-                int start = parseUserInt(startYear, Product.MIN_YEAR,
-                        Product.MAX_YEAR);
+                int end = parseYear(endYear);
+                int start = parseYear(startYear);
 
                 if (start == end) {
                     for (Product product : getProducts()) {
@@ -325,7 +314,7 @@ public class EStoreSearch {
                         }
                     }
                 } else if (start > end) {
-                    throw new InvalidInputException(INVALID_RANGE);
+                    throw new InvalidInputException(INVALID_START_END);
                 } else {
                     for (Product product : getProducts()) {
                         if (product.getYear() >= start
@@ -471,8 +460,8 @@ public class EStoreSearch {
         try {
             fileInput = new Scanner(new FileInputStream(filename));
         } catch (FileNotFoundException e) {
-            System.out.println(filename + " was not found or couldn't be opened.");
-            System.exit(0);
+            System.out.println(filename + " was not found.");
+            return;
         }
 
         while (fileInput.hasNextLine()) {
@@ -490,7 +479,7 @@ public class EStoreSearch {
                 } else if (attribute.equals("price")) {
                     price = parsePrice(value);
                 } else if (attribute.equals("year")) {
-                    year = parseUserInt(value, Product.MIN_YEAR, Product.MAX_YEAR);
+                    year = parseYear(value);
                 } else if (attribute.equals("authors")) {
                     authors = value;
                 } else if (attribute.equals("publisher")) {

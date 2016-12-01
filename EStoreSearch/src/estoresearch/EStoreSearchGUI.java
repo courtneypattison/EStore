@@ -24,11 +24,14 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     private JButton addButton, searchButton, resetAddButton, resetSearchButton;
     
     public static final int LINES = 10;
-    public static final int CHARS_PER_LINE = 20;
+    public static final int CHARS_PER_LINE = 40;
 
     public static final Insets BORDER_SIZE = new Insets(10, 10, 10, 10);
-    public static final Dimension COMPONENT_SIZE = new Dimension(800, 30);
-    public static final Dimension WINDOW_SIZE = new Dimension(809, 500);
+    public static final Dimension BETWEEN_BUTTONS = new Dimension(20, 20);
+    public static final Dimension BETWEEN_TEXT_FIELDS = new Dimension(20, 20);
+    
+    public static final int VGAP = 10;
+    public static final int HGAP = 10;
 
     public static final String ADD = "Add";
     public static final String SEARCH = "Search";
@@ -56,98 +59,6 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         CardLayout cardLayout = (CardLayout) (cards.getLayout());
         cardLayout.show(cards, menuItemName);
     }
-
-    /**
-     * Add menu item to menu
-     * 
-     * @param menu to be added to
-     * @param text to add the to menu item
-     */
-    private void addMenuItem(JMenu menu, String text) {
-        JMenuItem menuItem = new JMenuItem(text);
-        menuItem.addActionListener(this);
-        menu.add(menuItem);
-    }
-
-    /**
-     * Add menu to window
-     * 
-     * @param frame window to add menu to
-     */
-    private void addMenu(JFrame frame) {
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("Commands");
-
-        addMenuItem(menu, ADD);
-        addMenuItem(menu, SEARCH);
-        addMenuItem(menu, QUIT);
-
-        menuBar.add(menu);
-        frame.setJMenuBar(menuBar);
-    }
-
-    /**
-     * Style card orange, with a border, and using BorderLayout
-     * 
-     * @param card panel to be styled
-     */
-    private void styleCard(JPanel card) {
-        card.setBackground(Color.ORANGE);
-        card.setBorder(new EmptyBorder(BORDER_SIZE));
-        card.setLayout(new BorderLayout());
-    }
-
-    /**
-     * Set panel as orange and using BoxLayout
-     * 
-     * @param pane to be styled
-     */
-    private void styleBoxLayoutPanel(JPanel pane) {
-        pane.setBackground(Color.ORANGE);
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-    }
-
-    /**
-     * Create a card that welcomes the user to the EStore
-     * 
-     * @return welcome card
-     */
-    private JPanel createWelcomeCard() {
-        JPanel welcomeCard = new JPanel();
-        styleCard(welcomeCard);
-        styleBoxLayoutPanel(welcomeCard);
-
-        welcomeCard.add(new JLabel("Welcome to the eStore!"));
-        welcomeCard.add(new JLabel("Chooose a command from the \"Commands\""
-                + " menu above for adding a product, searching products, or"
-                + " quitting the program."));
-
-        return welcomeCard;
-    }
-
-    /**
-     * Add text field with label to a panel
-     * 
-     * @param pane to be added to
-     * @param text to label the text field with
-     * @return a panel containing a label and text field
-     */
-    private JTextField addLabelledTextField(JPanel pane, String text) {
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.ORANGE);
-        panel.setLayout(new BorderLayout());
-        panel.setMaximumSize(COMPONENT_SIZE);
-
-        JLabel label = new JLabel("   " + text);
-        JTextField textField = new JTextField(CHARS_PER_LINE);
-
-        panel.add(label, BorderLayout.LINE_START);
-        panel.add(textField);
-
-        pane.add(panel);
-
-        return textField;
-    }
     
     /**
      * Makes Book or Electronic fields visible or not depending of combo box
@@ -170,6 +81,84 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
             makerPane.setVisible(true);
         }
     }
+
+    /**
+     * Add menu item to menu
+     * 
+     * @param menu to be added to
+     * @param text to add the to menu item
+     */
+    private void addMenuItem(JMenu menu, String text) {
+        JMenuItem menuItem = new JMenuItem(text);
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
+    }
+
+    /**
+     * Add menu to window
+     * 
+     * @param frame window to add menu to
+     */
+    private JMenuBar createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        
+        JMenu menu = new JMenu("Commands");
+
+        addMenuItem(menu, ADD);
+        addMenuItem(menu, SEARCH);
+        addMenuItem(menu, QUIT);
+
+        menuBar.add(menu);
+        
+        return menuBar;
+    }
+
+    /**
+     * Create a card that welcomes the user to the EStore
+     * 
+     * @return welcome card
+     */
+    private JPanel createWelcomeCard() {
+        JPanel welcomeCard = new JPanel();
+        welcomeCard.setLayout(new BoxLayout(welcomeCard, BoxLayout.Y_AXIS));
+
+        welcomeCard.add(new JLabel("Welcome to the eStore!"));
+        welcomeCard.add(new JLabel("Chooose a command from the \"Commands\""
+                + " menu above for adding a product, searching products, or"
+                + " quitting the program."));
+
+        return welcomeCard;
+    }
+    
+    private void styleLabelledTextField(JPanel pane) {
+        pane.setLayout(new BorderLayout(HGAP, VGAP));
+    }
+    
+    private void styleButton(JButton button) {
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+    /**
+     * Add text field with label to a panel
+     * 
+     * @param pane to be added to
+     * @param text to label the text field with
+     * @return a panel containing a label and text field
+     */
+    private JTextField addLabelledTextField(JPanel pane, String text) {
+        JPanel panel = new JPanel();
+        styleLabelledTextField(panel);
+
+        JLabel label = new JLabel("   " + text);
+        JTextField textField = new JTextField(CHARS_PER_LINE);
+
+        panel.add(label, BorderLayout.LINE_START);
+        panel.add(textField, BorderLayout.LINE_END);
+
+        pane.add(panel);
+
+        return textField;
+    }
     
     /**
      * Create a panel with combo box, labels, text fields, and buttons used to
@@ -179,60 +168,41 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
      */
     private JPanel createAddInputPane() {
         JPanel addInputPane = new JPanel();
-        styleBoxLayoutPanel(addInputPane);
+        addInputPane.setLayout(new BoxLayout(addInputPane, BoxLayout.Y_AXIS));
         
         String[] comboBoxItems = {BOOK, ELECTRONIC};
         JComboBox comboBox = new JComboBox(comboBoxItems);
         comboBox.setEditable(false);
         comboBox.addItemListener(this);
-        comboBox.setMaximumSize(COMPONENT_SIZE);
-        addInputPane.add(comboBox, BorderLayout.PAGE_START); 
+        addInputPane.add(comboBox); 
         
         productID = addLabelledTextField(addInputPane, "Product ID: ");
         name = addLabelledTextField(addInputPane, "Name: ");
         price = addLabelledTextField(addInputPane, "Price: ");
         year = addLabelledTextField(addInputPane, "Year: ");
         
-        
         authorsPane = new JPanel();
-        authorsPane.setBackground(Color.ORANGE);
-        authorsPane.setLayout(new BorderLayout());
-        authorsPane.setMaximumSize(COMPONENT_SIZE);
-
+        styleLabelledTextField(authorsPane);
         JLabel authorsLabel = new JLabel("   Authors: ");
         authors = new JTextField(CHARS_PER_LINE);
-
         authorsPane.add(authorsLabel, BorderLayout.LINE_START);
-        authorsPane.add(authors);
-
+        authorsPane.add(authors, BorderLayout.LINE_END);
         addInputPane.add(authorsPane);
         
-        
         publisherPane = new JPanel();
-        publisherPane.setBackground(Color.ORANGE);
-        publisherPane.setLayout(new BorderLayout());
-        publisherPane.setMaximumSize(COMPONENT_SIZE);
-
+        styleLabelledTextField(publisherPane);
         JLabel publisherLabel = new JLabel("   Publisher: ");
         publisher = new JTextField(CHARS_PER_LINE);
-
         publisherPane.add(publisherLabel, BorderLayout.LINE_START);
-        publisherPane.add(publisher);
-
+        publisherPane.add(publisher, BorderLayout.LINE_END);
         addInputPane.add(publisherPane);
         
-        
         makerPane = new JPanel();
-        makerPane.setBackground(Color.ORANGE);
-        makerPane.setLayout(new BorderLayout());
-        makerPane.setMaximumSize(COMPONENT_SIZE);
-
-        JLabel makerLabel = new JLabel("   Publisher: ");
+        styleLabelledTextField(makerPane);
+        JLabel makerLabel = new JLabel("   Maker: ");
         maker = new JTextField(CHARS_PER_LINE);
-
         makerPane.add(makerLabel, BorderLayout.LINE_START);
-        makerPane.add(maker);
-
+        makerPane.add(maker, BorderLayout.LINE_END);
         addInputPane.add(makerPane);
 
         makerPane.setVisible(false); // default is Book
@@ -284,13 +254,17 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
      */
     private JPanel createAddButtonPane() {
         JPanel addButtonPane = new JPanel();
-        styleBoxLayoutPanel(addButtonPane);
+        addButtonPane.setLayout(new BoxLayout(addButtonPane, BoxLayout.Y_AXIS));
 
         resetAddButton = new JButton("Reset");
+        styleButton(resetAddButton);
+        addButtonPane.add(Box.createRigidArea(BETWEEN_BUTTONS));
         resetAddButton.addActionListener(e -> resetAdd());
         addButtonPane.add(resetAddButton);
 
         addButton = new JButton("Add");
+        styleButton(addButton);
+        addButtonPane.add(Box.createRigidArea(BETWEEN_BUTTONS));
         addButton.addActionListener(e -> addProduct());
         addButtonPane.add(addButton);
 
@@ -298,19 +272,22 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     }
     
     /**
+     * Create a panel for messages
      * 
-     * 
-     * @param frame
      */
     private JPanel createMessagesPane() {
         messages = new JPanel();
-        styleBoxLayoutPanel(messages);
+        messages.setLayout(new BoxLayout(messages, BoxLayout.Y_AXIS));
         
         messagesDisplay = new JTextArea(LINES, CHARS_PER_LINE);
         messagesDisplay.setEditable(false);
 
+        JLabel messagesLabel = new JLabel("Messages");
+        messagesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JScrollPane scrollPane = new JScrollPane(messagesDisplay);
-        messages.add(new JLabel("Messages"));
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        messages.add(messagesLabel);
         messages.add(scrollPane);
 
         return messages;
@@ -318,37 +295,19 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
 
     /**
      * Create a card used for adding products
-     * 
-     * @return a card used for adding products
      */
     private JPanel createAddCard() {
         JPanel addCard = new JPanel();
-        styleCard(addCard);
+        addCard.setLayout(new BorderLayout(HGAP, VGAP));
+
         addCard.add(new JLabel("Adding a product"), BorderLayout.PAGE_START);
-        addCard.add(createAddInputPane(), BorderLayout.LINE_START);
+        addCard.add(createAddInputPane(), BorderLayout.CENTER);
         addCard.add(createAddButtonPane(), BorderLayout.LINE_END);
         addCard.add(createMessagesPane(), BorderLayout.PAGE_END);
 
         return addCard;
     }
-
-    /**
-     * Create a panel used for inputing search terms
-     * 
-     * @return a panel used for inputing search terms
-     */
-    private JPanel createSearchInputPane() {
-        JPanel searchInputPane = new JPanel();
-        styleBoxLayoutPanel(searchInputPane);
-
-        productIDSearch = addLabelledTextField(searchInputPane, "Product ID: ");
-        keywordsSearch = addLabelledTextField(searchInputPane, "Name keywords: ");
-        startYearSearch = addLabelledTextField(searchInputPane, "Start year: ");
-        endYearSearch = addLabelledTextField(searchInputPane, "End year: ");
-
-        return searchInputPane;
-    }
-
+    
     /**
      * Remove text from search fields
      */
@@ -372,6 +331,23 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
             searchResultsDisplay.setText(e.getMessage());
         }
     }
+    
+    /**
+     * Create a panel used for inputing search terms
+     * 
+     * @return a panel used for inputing search terms
+     */
+    private JPanel createSearchInputPane() {
+        JPanel searchInputPane = new JPanel();
+        searchInputPane.setLayout(new BoxLayout(searchInputPane, BoxLayout.Y_AXIS));
+
+        productIDSearch = addLabelledTextField(searchInputPane, "Product ID: ");
+        keywordsSearch = addLabelledTextField(searchInputPane, "Name keywords: ");
+        startYearSearch = addLabelledTextField(searchInputPane, "Start year: ");
+        endYearSearch = addLabelledTextField(searchInputPane, "End year: ");
+
+        return searchInputPane;
+    }
 
     /**
      * Create panel filled with buttons used for searching
@@ -380,33 +356,38 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
      */
     private JPanel createSearchButtonPane() {
         JPanel searchButtonPane = new JPanel();
-        styleBoxLayoutPanel(searchButtonPane);
+        searchButtonPane.setLayout(new BoxLayout(searchButtonPane, BoxLayout.Y_AXIS));
 
         resetSearchButton = new JButton("Reset");
+        styleButton(resetSearchButton);
         resetSearchButton.addActionListener(e -> resetSearch());
+        searchButtonPane.add(Box.createRigidArea(BETWEEN_BUTTONS));
         searchButtonPane.add(resetSearchButton);
 
         searchButton = new JButton("Search");
+        styleButton(searchButton);
         searchButton.addActionListener(e -> performSearch());
+        searchButtonPane.add(Box.createRigidArea(BETWEEN_BUTTONS));
         searchButtonPane.add(searchButton);
 
         return searchButtonPane;
     }
     
     /**
-     * 
-     * 
-     * @param frame
+     * Create a panel to show search results
      */
     private JPanel createSearchResultsPane() {
         searchResults = new JPanel();
-        styleBoxLayoutPanel(searchResults);
+        searchResults.setLayout(new BoxLayout(searchResults, BoxLayout.Y_AXIS));
         
         searchResultsDisplay = new JTextArea(LINES, CHARS_PER_LINE);
         searchResultsDisplay.setEditable(false);
 
+        JLabel searchResultsLabel = new JLabel("Search results");
+        searchResultsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JScrollPane scrollPane = new JScrollPane(searchResultsDisplay);
-        searchResults.add(new JLabel("Search results"));
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        searchResults.add(searchResultsLabel);
         searchResults.add(scrollPane);
         
         return searchResults;
@@ -419,9 +400,10 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
      */
     private JPanel createSearchCard() {
         JPanel searchCard = new JPanel();
-        styleCard(searchCard);
+        searchCard.setLayout(new BorderLayout(HGAP, VGAP));
 
-        searchCard.add(createSearchInputPane(), BorderLayout.LINE_START);
+        searchCard.add(new JLabel("Searching products"), BorderLayout.PAGE_START);
+        searchCard.add(createSearchInputPane(), BorderLayout.CENTER);
         searchCard.add(createSearchButtonPane(), BorderLayout.LINE_END);
         searchCard.add(createSearchResultsPane(), BorderLayout.PAGE_END);
 
@@ -429,17 +411,20 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     }
 
     /**
-     * Add cards to window
+     * Creates cards and adds them to cards panel
      * 
-     * @param frame main window
+     * @ return a set of cards
      */
-    private void addCards(JFrame frame) {
+    private JPanel createCards() {
         cards = new JPanel(new CardLayout());
+        cards.setBorder(new EmptyBorder(BORDER_SIZE));
+        
+        // Add cards that correspond to menu items
         cards.add(createWelcomeCard());
         cards.add(createAddCard(), ADD);
         cards.add(createSearchCard(), SEARCH);
 
-        frame.add(cards, BorderLayout.CENTER);
+        return cards;
     }
 
     /**
@@ -448,6 +433,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
     private void createAndShowGUI() {
         JFrame frame = new JFrame("eStore");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setLayout(new BorderLayout(HGAP, VGAP));
+        
+        // Save products before exiting
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -456,10 +444,9 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
             }
         });
 
-        addMenu(frame);
-        addCards(frame);
-        
-        frame.setMinimumSize(WINDOW_SIZE);
+        frame.add(createMenuBar(), BorderLayout.PAGE_START);
+        frame.add(createCards(), BorderLayout.CENTER);
+
         frame.pack();
         frame.setVisible(true);
     }
