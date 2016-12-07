@@ -20,10 +20,3 @@ price = ""
 year = "1999"
 maker = ""
 
-type = "electronics"
-productID = "888888"
-name = "8"
-price = "8.0"
-year = "1000"
-maker = "8"
-

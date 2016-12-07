@@ -171,7 +171,7 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         addInputPane.setLayout(new BoxLayout(addInputPane, BoxLayout.Y_AXIS));
         
         String[] comboBoxItems = {BOOK, ELECTRONIC};
-        JComboBox comboBox = new JComboBox(comboBoxItems);
+        JComboBox<String> comboBox = new JComboBox<>(comboBoxItems);
         comboBox.setEditable(false);
         comboBox.addItemListener(this);
         addInputPane.add(comboBox); 
@@ -285,6 +285,8 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         JLabel messagesLabel = new JLabel("Messages");
         messagesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JScrollPane scrollPane = new JScrollPane(messagesDisplay);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         messages.add(messagesLabel);
@@ -386,6 +388,8 @@ public class EStoreSearchGUI implements ActionListener, ItemListener {
         JLabel searchResultsLabel = new JLabel("Search results");
         searchResultsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JScrollPane scrollPane = new JScrollPane(searchResultsDisplay);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         searchResults.add(searchResultsLabel);
         searchResults.add(scrollPane);
